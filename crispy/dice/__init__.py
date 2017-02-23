@@ -1,1 +1,1 @@
-from core import Check, Dice
+from crispy.dice.core import Check, Dice
