@@ -3,15 +3,29 @@ from corerules import attacks, damages
 import gui
 
 
-gui.game.run()
+universe = System()
+world = universe.Entity()
+dungeon = universe.Entity(world_x=0, world_y=0)
+block1 = universe.Entity(x=50, y=200)
+block2 = universe.Entity(x=100, y=50)
+world.contents = list()
+dungeon.contents = list()
+world.contents.append(dungeon)
+dungeon.contents.append(block1)
+dungeon.contents.append(block2)
+
+
+game = gui.GameApp(world)
+game.run()
+
 
 world = System()
 
-player = world.Entity(melee=5, ranged=0, max_hp=10, hp=10)
-monster = world.Entity(armor_class=2, max_hp=10, hp=10, resistances=["piercing"], vulnerabilities=["fire"])
-bow = world.Entity(ranged_bonus=3, ranged_damage=[1, 4])
-arrow = world.Entity(ranged_bonus=3, ranged_damage=["piercing", 10])
-dagger = world.Entity(melee_bonus=1, melee_damage=[1, 6])
+player = universe.Entity(melee=5, ranged=0, max_hp=10, hp=10)
+monster = universe.Entity(armor_class=2, max_hp=10, hp=10, resistances=["piercing"], vulnerabilities=["fire"])
+bow = universe.Entity(ranged_bonus=3, ranged_damage=[1, 4])
+arrow = universe.Entity(ranged_bonus=3, ranged_damage=["piercing", 10])
+dagger = universe.Entity(melee_bonus=1, melee_damage=[1, 6])
 
 
 def sneakattack(attack):
