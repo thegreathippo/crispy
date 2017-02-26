@@ -2,17 +2,13 @@ from crispy.ecs import System
 from corerules import attacks, damages
 
 
-class Dummy:
+world = System()
 
-  def __init__(self, **kwargs):
-    self.__dict__.update(kwargs)
-
-
-player = Dummy(melee=5, ranged=0, max_hp=10, hp=10)
-monster = Dummy(armor_class=2, max_hp=10, hp=10, resistances=["piercing"], vulnerabilities=["fire"])
-bow = Dummy(ranged_bonus=3, ranged_damage=[1, 4])
-arrow = Dummy(ranged_bonus=3, ranged_damage=["piercing", 10])
-dagger = Dummy(melee_bonus=1, melee_damage=[1, 6])
+player = world.Entity(melee=5, ranged=0, max_hp=10, hp=10)
+monster = world.Entity(armor_class=2, max_hp=10, hp=10, resistances=["piercing"], vulnerabilities=["fire"])
+bow = world.Entity(ranged_bonus=3, ranged_damage=[1, 4])
+arrow = world.Entity(ranged_bonus=3, ranged_damage=["piercing", 10])
+dagger = world.Entity(melee_bonus=1, melee_damage=[1, 6])
 
 
 def sneakattack(attack):
