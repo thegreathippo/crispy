@@ -89,7 +89,7 @@ tcl/
 pip-selfcheck.json
 
 #PyCharm
-.ideas/
+.idea/
 
 # Spyder project settings
 .spyderproject
