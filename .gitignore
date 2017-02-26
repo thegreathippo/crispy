@@ -96,3 +96,6 @@ pip-selfcheck.json
 
 # Rope project settings
 .ropeproject
+
+# Custom
+wheels/
