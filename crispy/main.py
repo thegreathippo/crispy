@@ -1,6 +1,9 @@
 from crispy.ecs import System
 from corerules import attacks, damages
+import gui
 
+
+gui.game.run()
 
 world = System()
 
@@ -12,21 +15,21 @@ dagger = world.Entity(melee_bonus=1, melee_damage=[1, 6])
 
 
 def sneakattack(attack):
-  if attack.check.vantage > 0:
-    attack.dicepool.add_die(["piercing", 10])
+    if attack.check.vantage > 0:
+        attack.dicepool.add_die(["piercing", 10])
 
 
 def always_advantage(attack):
-  attack.check.vantage += 1
+    attack.check.vantage += 1
 
 
 def vulnerability_and_resistance(damage):
-  for v in damage.target.vulnerabilities:
-    if v in damage.roll:
-      damage.roll[v] = damage.roll[v] * 2
-  for r in damage.target.resistances:
-    if r in damage.roll:
-      damage.roll[r] = damage.roll[r] // 2
+    for v in damage.target.vulnerabilities:
+        if v in damage.roll:
+            damage.roll[v] *= 2
+    for r in damage.target.resistances:
+        if r in damage.roll:
+            damage.roll[r] //= 2
 
 
 attacks.Attack.add_pre_rule(always_advantage)
