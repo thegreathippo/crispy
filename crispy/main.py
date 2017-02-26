@@ -36,10 +36,12 @@ player.behaviors = dict()
 player.behaviors["Attack"] = dict()
 player.behaviors["Attack"]["attacker"] = [sneakattack]
 
-
-
 result = attacks.Shoot(attacker=player, weapon=bow, ammo=arrow, target=monster)
 
+
+print()
+print()
+print()
 print("Attack")
 print("Rolled: {}".format(result.check.roll))
 print("({0}/{1}/{2})".format(result.check._first, result.check._low, result.check._high))

@@ -1,5 +1,6 @@
 from .entities import BaseEntity
 from .processes import BaseProcess
+import kivy
 
 
 def _empty():
