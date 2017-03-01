@@ -6,7 +6,6 @@ from kivy.uix.button import Button
 from kivy.uix.scrollview import ScrollView
 
 
-
 kivy.require("1.9.0")
 
 TILE_SIZE = 0.05, 0.05

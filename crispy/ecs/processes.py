@@ -3,7 +3,7 @@ class _ProcessType(type):
         cls = super().__new__(mcs, name, bases, namespace)
         if cls.root:
             process = cls()
-            cls.root.register_process(process.process, priority=process.priority,
+            cls.root.register_process(process.run, priority=process.priority,
                                       domain=process.domain,
                                       startup=process.startup,
                                       setup=process.setup,
@@ -23,7 +23,13 @@ class BaseProcess(metaclass=_ProcessType):
     def setup(self):
         pass
 
-    def process(self, entity):
+    def enter(self, entity):
+        pass
+
+    def run(self, entity):
+        pass
+
+    def exit(self, entity):
         pass
 
     def teardown(self):
