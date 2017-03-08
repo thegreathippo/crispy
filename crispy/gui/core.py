@@ -8,7 +8,7 @@ from kivy.uix.scrollview import ScrollView
 
 kivy.require("1.9.0")
 
-TILE_SIZE = 0.05, 0.05
+TILE_SIZE = 20
 
 
 class GameApp(App):
@@ -16,7 +16,7 @@ class GameApp(App):
     def __init__(self, world):
         super().__init__()
         self.world = world
-        self.tilemap = TileMap(size=(900, 900), pos=(0, 0), size_hint=(None, None))
+        self.tilemap = TileMap(self.world, size=(900, 900), pos=(0, 0), size_hint=(None, None))
 
     def build(self):
         window = RootWindow()
@@ -26,7 +26,6 @@ class GameApp(App):
                           orientation="horizontal")
         window.add_widget(view)
         window.add_widget(menu)
-        self.tilemap.load(self.world)
         return window
 
 
@@ -40,19 +39,39 @@ class ViewWindow(ScrollView):
 
 class TileMap(FloatLayout):
 
-    def load(self, world):
+    def __init__(self, world, **kwargs):
+        super().__init__(**kwargs)
+        self.world = world
+        self.load()
+
+    def refresh(self, cell):
+        self.remove_widget(cell.tile)
+        self.load_tile(cell)
+
+    def load_tile(self, cell):
+        tile = Tile(cell)
+        cell.tile = tile
+        cell.gui_callback = self.refresh
+        self.add_widget(tile)
+
+    def load(self):
         self.clear_widgets()
-        for cell in world:
-            img = "gui/" + cell.image + ".png"
-            pos = cell.x * 32, cell.y * 32
-            size = 31, 31
-            size_hint = None, None
-            tile = Tile(background_normal=img, size_hint=size_hint, size=size, pos=pos)
-            self.add_widget(tile)
+        for cell in self.world:
+            self.load_tile(cell)
 
 
 class Tile(Button):
-    pass
+    def __init__(self, cell, **kwargs):
+        super().__init__(**kwargs)
+        self.size_hint = None, None
+        self.size = TILE_SIZE - 1, TILE_SIZE - 1
+        self.pos = cell.x * TILE_SIZE, cell.y * TILE_SIZE
+        self.background_normal = "gui/" + cell.image + ".png"
+        self.cell = cell
+
+    def on_touch_down(self, touch):
+        if self.collide_point(*touch.pos):
+            self.parent.world.fill([self.cell])
 
 
 class BottomMenu(BoxLayout):

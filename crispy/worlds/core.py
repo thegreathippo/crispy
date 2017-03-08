@@ -1,11 +1,16 @@
 from .grids import Grid2, Graph
 
 
+def _empty(arg):
+    pass
+
+
 class World(Grid2):
     cell_defaults = {"solid": True,
                      "image": "void",
                      "wall": False,
-                     "denizen": None
+                     "denizen": None,
+                     "gui_callback": _empty
                      }
 
     @staticmethod
@@ -41,15 +46,18 @@ def convert_to_space(cell, denizen):
     cell.denizen = denizen
     cell.solid = False
     cell.wall = False
+    cell.gui_callback(cell)
 
 
 def convert_to_wall(cell):
     cell.image = "wall"
     cell.solid = True
     cell.wall = True
+    cell.gui_callback(cell)
 
 
 def convert_to_fill(cell):
     cell.image = "void"
     cell.solid = True
     cell.wall = False
+    cell.gui_callback(cell)
