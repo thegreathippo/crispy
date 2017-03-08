@@ -26,8 +26,7 @@ class GameApp(App):
                           orientation="horizontal")
         window.add_widget(view)
         window.add_widget(menu)
-        area = self.world.contents[0]
-        self.tilemap.load(area)
+        self.tilemap.load(self.world)
         return window
 
 
@@ -41,14 +40,19 @@ class ViewWindow(ScrollView):
 
 class TileMap(FloatLayout):
 
-    def load(self, area):
+    def load(self, world):
         self.clear_widgets()
-        for block in area.contents:
-            img = "gui/dungeontile.png"
-            pos = block.x, block.y
-            size_hint = TILE_SIZE
-            tile = Button(background_normal=img, size_hint=size_hint, pos=pos)
+        for cell in world:
+            img = "gui/" + cell.image + ".png"
+            pos = cell.x * 32, cell.y * 32
+            size = 31, 31
+            size_hint = None, None
+            tile = Tile(background_normal=img, size_hint=size_hint, size=size, pos=pos)
             self.add_widget(tile)
+
+
+class Tile(Button):
+    pass
 
 
 class BottomMenu(BoxLayout):
