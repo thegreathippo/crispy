@@ -1,16 +1,12 @@
-from crispy.ecs import System
-from corerules import attacks, damages
+from world import game
 import gui
-import worlds
 
 
-world = worlds.World()
+app = gui.GameApp(game)
 
-room = world.get_block(5, 5, 10, 10)
-world.carve(room)
-
-room = world.get_block(7, 7, 5, 3)
-world.fill(room)
-
-game = gui.GameApp(world)
-game.run()
+game.fill(5, 5, 0)
+game.fill(4, 4, 0)
+game.fill(3, 3, 0)
+game.fill(2, 2, 0)
+game.fill(1, 1, 0)
+app.run()
