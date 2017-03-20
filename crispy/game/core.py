@@ -2,7 +2,7 @@ from .compdicts import InverseDict, ReverseDict, CallbackDict
 from .ecs import System
 
 
-class Game(System):
+class World(System):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self["cell"] = InverseDict()
@@ -12,7 +12,11 @@ class Game(System):
         self.camera = self.get_entity(pos=(0, 0, 0))
         self.player = None
 
-    def fill(self, x, y=None, z=None, material=None):
+    def fill(self, *args, material=None):
+        for pos in args:
+            self.add_block(pos, material)
+
+    def add_block(self, x, y=None, z=None, material=None):
         pos = get_coor(x, y, z)
         self.get_entity(cell=pos, material=material, tile_pos=pos)
 
@@ -35,5 +39,5 @@ def get_coor(x, y=None, z=None):
         return x
 
 
-game = Game()
+world = World()
 

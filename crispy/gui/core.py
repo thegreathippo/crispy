@@ -10,12 +10,13 @@ TILE_SIZE = 20
 
 class GameApp(App):
 
-    def __init__(self, game):
+    def __init__(self, world):
         super().__init__()
-        self.game = game
-        self.tilemap = TileMap(size=(900, 900), size_hint=(None, None))
+        self.world = world
+        self.tilemap = TileMap(world, size=(900, 900), size_hint=(None, None))
         self.eid_to_tile = dict()
-        game["tile_pos"].on_add(self.add_tile)
+        world["tile_pos"].on_add(self.add_tile)
+        world["tile_pos"].on_remove(self.remove_tile)
 
     def build(self):
         return self.tilemap
@@ -26,9 +27,19 @@ class GameApp(App):
         self.eid_to_tile[eid] = tile
         self.tilemap.add_widget(tile)
 
+    def remove_tile(self, eid):
+        tile = self.eid_to_tile[eid]
+        self.tilemap.remove_widget(tile)
+
 
 class TileMap(FloatLayout):
-    pass
+    def __init__(self, world, **kwargs):
+        super().__init__(**kwargs)
+        self.world = world
+
+    def on_touch_down(self, touch):
+        x, y = int(touch.pos[0] // TILE_SIZE), int(touch.pos[1] // TILE_SIZE)
+        self.world.add_block(x, y, 0)
 
 
 class Tile(Button):

@@ -1,12 +1,18 @@
-from world import game
+from game import world
 import gui
 
 
-app = gui.GameApp(game)
+app = gui.GameApp(world)
 
-game.fill(5, 5, 0)
-game.fill(4, 4, 0)
-game.fill(3, 3, 0)
-game.fill(2, 2, 0)
-game.fill(1, 1, 0)
+blocks = [
+    (5, 5, 0),
+    (5, 6, 0),
+    (5, 7, 0),
+    (6, 5, 0),
+    (6, 6, 0),
+    (6, 7, 0)
+]
+
+
+world.fill(*blocks)
 app.run()

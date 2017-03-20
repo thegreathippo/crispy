@@ -7,9 +7,10 @@ class InverseDict(dict):
         self.inverse = dict()
 
     def __setitem__(self, item, value):
-        old_value = self.get(item, NULL)
-        if not old_value is NULL:
-            del self.inverse[old_value]
+        old_item = self.inverse.get(value, NULL)
+        if old_item is not NULL:
+            old_value = self[old_item]
+            del self[old_item]
         super().__setitem__(item, value)
         self.inverse[value] = item
 
