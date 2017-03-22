@@ -31,30 +31,38 @@ class TileMap(FloatLayout):
             self.add_widget(tile)
 
     def on_touch_down(self, touch):
-        if not touch.is_double_tap:
-            if touch.button == "left":
+        if touch.button == "left" and self.parent.mode in DRAW_MODE:
+            if self.parent.mode == DRAW_FLOOR_MODE:
                 z = 0
-            elif touch.button == "right":
-                z = 1
             else:
-                z = 0
-                print("ELSE")
+                z = 1
             x, y = int(touch.pos[0] // TILE_SIZE), int(touch.pos[1] // TILE_SIZE)
             try:
                 self.world.set_block(x, y, z)
             except ValueError:
                 pass
-        else:
-            for child in self.children:
-                child.on_touch_down(touch)
+        for child in self.children:
+            child.on_touch_down(touch)
+
+
+class FloorMap(TileMap):
+    pass
+
+class WallMap(TileMap):
+    pass
 
 
 class Tile(Image):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.allow_stretch = True
+
     def on_touch_down(self, touch):
         if self.collide_point(*touch.pos):
             eid = self.parent.tile_eid[self]
-            del self.parent.world["cell"][eid]
-            del self.parent.world["tile"][eid]
+            if self.parent.parent.mode == ERASE_MODE:
+                del self.parent.world["cell"][eid]
+                del self.parent.world["tile"][eid]
 
 
 class Floor(Tile):
@@ -63,4 +71,3 @@ class Floor(Tile):
 
 class Wall(Tile):
     pass
-

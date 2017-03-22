@@ -1,0 +1,22 @@
+#: kivy 1.0.9
+
+<EditButton@Button>:
+    size: 50, 30
+    size_hint: None, None
+
+<View>:
+
+    EditButton:
+        text: "erase"
+        x: 0
+        on_press: root.erase_mode()
+
+    EditButton:
+        text: "wall"
+        x: 50
+        on_press: root.draw_wall_mode()
+
+    EditButton:
+        text: "floor"
+        x: 100
+        on_press: root.draw_floor_mode()

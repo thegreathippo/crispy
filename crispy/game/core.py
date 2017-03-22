@@ -50,7 +50,7 @@ class World(System):
 
 
 def get_coor(x, y=None, z=None):
-    if y:
+    if y is not None:
         return x, y, z
     else:
         return x

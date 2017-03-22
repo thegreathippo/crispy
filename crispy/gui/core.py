@@ -2,8 +2,11 @@ import kivy
 from kivy.app import App
 from kivy.uix.floatlayout import FloatLayout
 from kivy.config import Config
-from gui.tilemaps import TileMap, Floor, Wall
+from gui.tilemaps import FloorMap, WallMap, Floor, Wall
 from config import *
+from kivy.lang import Builder
+Builder.load_file('gui/game.kv')
+
 
 Config.set('input', 'mouse', 'mouse,multitouch_on_demand')
 
@@ -15,11 +18,11 @@ class GameApp(App):
     def __init__(self, world):
         super().__init__()
         self.world = world
-        self.view = FloatLayout()
-        self.floormap = TileMap(world, size_hint=(None, None))
-        self.wallmap = TileMap(world, size_hint=(None, None))
-        self.view.add_widget(self.floormap)
-        self.view.add_widget(self.wallmap)
+        self.view = View()
+        self.floormap = FloorMap(world, size_hint=(None, None))
+        self.wallmap = WallMap(world, size_hint=(None, None))
+        self.view.add_widget(self.floormap, 3)
+        self.view.add_widget(self.wallmap, 2)
         world["tile"].on_new = self.add_tile
         world["tile"].on_del = self.remove_tile
         world["sprite"].on_new = self.add_sprite
@@ -61,4 +64,19 @@ class GameApp(App):
     def remove_sprite(self, eid):
         pass
 
+
+class View(FloatLayout):
+
+    def __init__(self):
+        super().__init__()
+        self.mode = None
+
+    def erase_mode(self):
+        self.mode = ERASE_MODE
+
+    def draw_wall_mode(self):
+        self.mode = DRAW_WALL_MODE
+
+    def draw_floor_mode(self):
+        self.mode = DRAW_FLOOR_MODE
 

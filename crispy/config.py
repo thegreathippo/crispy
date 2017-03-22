@@ -1,2 +1,10 @@
-TILE_SIZE = 16
+TILE_SIZE = 32
 SPRITE_SIZE = TILE_SIZE, TILE_SIZE + (TILE_SIZE // 2)
+
+
+ERASE_MODE = "erase mode"
+DRAW_FLOOR_MODE = "draw floor mode"
+DRAW_WALL_MODE = "draw wall mode"
+
+
+DRAW_MODE = [DRAW_FLOOR_MODE, DRAW_WALL_MODE]
