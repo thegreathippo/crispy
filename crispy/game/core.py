@@ -1,24 +1,40 @@
-from .compdicts import InverseDict, ReverseDict, CallbackDict
 from .ecs import System
+from utils import CellDict
+from utils import CallbackDict
+from utils import CallbackPosDict
 
 
 class World(System):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self["cell"] = InverseDict()
-        self["pos"] = ReverseDict()
-        self["tile_pos"] = CallbackDict()
-        self["tile_sprite"] = CallbackDict()
-        self.camera = self.get_entity(pos=(0, 0, 0))
+    def __init__(self):
+        super().__init__()
+
+        class Entity(self.entity_cls):
+            @property
+            def x(self):
+                return self.pos[0]
+
+            @property
+            def y(self):
+                return self.pos[1]
+
+            @property
+            def z(self):
+                return self.pos[2]
+
+        self.entity_cls = Entity
+        self["cell"] = CellDict()
+        self["pos"] = CallbackPosDict()
+        self["tile"] = CallbackDict()
+        self.camera = 0, 0, 0
         self.player = None
 
     def fill(self, *args, material=None):
         for pos in args:
-            self.add_block(pos, material)
+            self.set_block(pos, material)
 
-    def add_block(self, x, y=None, z=None, material=None):
+    def set_block(self, x, y=None, z=None, material=None):
         pos = get_coor(x, y, z)
-        self.get_entity(cell=pos, material=material, tile_pos=pos)
+        return self.get_entity(cell=pos, material=material, tile=pos)
 
     def get_block(self, x, y=None, z=None):
         pos = get_coor(x, y, z)
@@ -40,4 +56,3 @@ def get_coor(x, y=None, z=None):
 
 
 world = World()
-

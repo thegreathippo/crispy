@@ -1,10 +1,9 @@
-from ..ecs.entities import Root
+from .entities import Root
 
 
 class System(Root):
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self):
+        super().__init__()
         self._processes = dict()
         self._queue = list()
 
