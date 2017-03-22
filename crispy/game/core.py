@@ -1,7 +1,7 @@
 from .ecs import System
 from utils import CellDict
 from utils import CallbackDict
-from utils import CallbackPosDict
+from utils import PosDict
 
 
 class World(System):
@@ -23,8 +23,9 @@ class World(System):
 
         self.entity_cls = Entity
         self["cell"] = CellDict()
-        self["pos"] = CallbackPosDict()
+        self["pos"] = PosDict()
         self["tile"] = CallbackDict()
+        self["sprite"] = CallbackDict()
         self.camera = 0, 0, 0
         self.player = None
 
