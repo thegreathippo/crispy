@@ -4,70 +4,41 @@ from config import *
 
 
 class TileMap(FloatLayout):
-    def __init__(self, world, **kwargs):
-        super().__init__(**kwargs)
-        self.world = world
-        self.y_map = dict()
-        self.tile_eid = dict()
-
-    def add_tile(self, tile, eid, y=0):
-        self.y_map[tile] = y
-        self.tile_eid[tile] = eid
-        self.tile_eid[eid] = tile
-        self.refresh()
-
-    def remove_tile(self, eid):
-        tile = self.tile_eid[eid]
-        del self.tile_eid[tile]
-        del self.tile_eid[eid]
-        del self.y_map[tile]
-        self.refresh()
-
-    def refresh(self):
-        self.clear_widgets()
-        tiles = [t for t in self.y_map.keys()]
-        tiles = sorted(tiles, key=lambda t: self.y_map[t], reverse=True)
-        for tile in tiles:
-            self.add_widget(tile)
-
-    def on_touch_down(self, touch):
-        if touch.button == "left" and self.parent.mode in DRAW_MODE:
-            if self.parent.mode == DRAW_FLOOR_MODE:
-                z = 0
-            else:
-                z = 1
-            x, y = int(touch.pos[0] // TILE_SIZE), int(touch.pos[1] // TILE_SIZE)
-            try:
-                self.world.set_block(x, y, z)
-            except ValueError:
-                pass
-        for child in self.children:
-            child.on_touch_down(touch)
+    pass
 
 
 class FloorMap(TileMap):
     pass
 
+
 class WallMap(TileMap):
     pass
 
 
-class Tile(Image):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+class BaseTile(Image):
+    def __init__(self, z):
+        super().__init__()
         self.allow_stretch = True
+        self.size = SPRITE_SIZE
+        self.size_hint = None, None
+        self.z = z
 
     def on_touch_down(self, touch):
         if self.collide_point(*touch.pos):
-            eid = self.parent.tile_eid[self]
-            if self.parent.parent.mode == ERASE_MODE:
-                del self.parent.world["cell"][eid]
-                del self.parent.world["tile"][eid]
+            return True
 
 
-class Floor(Tile):
-    pass
+class Floor(BaseTile):
+    def __init__(self, x, y, z):
+        super().__init__(z)
+        self.source = "gui/blocks/granite_floor.png"
+        self.x = x * TILE_SIZE
+        self.y = y * TILE_SIZE - (TILE_SIZE // 2)
 
 
-class Wall(Tile):
-    pass
+class Wall(BaseTile):
+    def __init__(self, x, y, z):
+        super().__init__(z)
+        self.source = "gui/blocks/granite_wall.png"
+        self.x = x * TILE_SIZE
+        self.y = y * TILE_SIZE

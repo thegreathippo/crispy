@@ -1,6 +1,7 @@
 TILE_SIZE = 32
 SPRITE_SIZE = TILE_SIZE, TILE_SIZE + (TILE_SIZE // 2)
 
+DEFAULT_SAVE_PATH = "game.pkl"
 
 ERASE_MODE = "erase mode"
 DRAW_FLOOR_MODE = "draw floor mode"

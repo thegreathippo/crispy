@@ -4,7 +4,8 @@ import inspect
 NULL = object()
 Point3 = collections.namedtuple("Point3", ["x", "y", "z"])
 
-__all__ = ["InternalDict", "CellDict", "PosDict", "CallbackDict", "CallbackPosDict"]
+__all__ = ["InternalDict", "CellDict", "PosDict", "CallbackDict", "CallbackPosDict",
+           "CallbackCellDict"]
 
 
 class InternalDict:
@@ -22,6 +23,9 @@ class InternalDict:
 
     def __delitem__(self, item):
         del self.data[item]
+
+    def __iter__(self):
+        return iter(self.data)
 
     def __repr__(self):
         return str(self.data)
@@ -50,6 +54,10 @@ class CellDict(dict):
         del self.inverse[value]
         super().__delitem__(item)
 
+    def clear(self):
+        super().clear()
+        self.inverse.clear()
+
 
 class PosDict(dict):
     value_cls = Point3
@@ -76,6 +84,10 @@ class PosDict(dict):
         if not self.inverse[value]:
             del self.inverse[value]
         super().__delitem__(item)
+
+    def clear(self):
+        super().clear()
+        self.inverse.clear()
 
 
 class CallbackDict(dict):
@@ -138,7 +150,7 @@ class CallbackDict(dict):
         old_value = self.get(item, NULL)
         super().__setitem__(item, value)
         self.on_set(item, value)
-        if not old_value is NULL:
+        if old_value is not NULL:
             if old_value != value:
                 self.on_change(item, old_value, value)
         else:
@@ -148,8 +160,18 @@ class CallbackDict(dict):
         super().__delitem__(item)
         self.on_del(item)
 
+    def clear(self):
+        items = set(self.keys())
+        super().clear()
+        for item in items:
+            self.on_del(item)
+
 
 class CallbackPosDict(PosDict, CallbackDict):
+    pass
+
+
+class CallbackCellDict(CellDict, CallbackDict):
     pass
 
 
