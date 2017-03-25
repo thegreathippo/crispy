@@ -54,7 +54,6 @@ class World(System):
 
     def move_block(self, block, vx, vy=None, vz=None):
         vx, vy, vz = get_coor(vx, vy, vz)
-        print(block.cell)
         try:
             x, y, z = block.cell.x + vx, block.cell.y + vy, block.cell.z + vz
             block.cell = x, y, z
