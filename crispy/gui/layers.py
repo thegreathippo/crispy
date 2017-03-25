@@ -1,4 +1,3 @@
-from kivy.app import App
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.scatterlayout import ScatterLayout
 from kivy.uix.image import Image
@@ -26,6 +25,10 @@ class ViewScreen(ScatterLayout):
         layer.remove_sprite(eid)
         del self.eids[eid]
 
+    def move_sprite(self, eid, old_pos, new_pos):
+        layer = self.eids[eid]
+        layer.move_sprite(eid, old_pos, new_pos)
+
     def move_camera(self, old_val, new_val):
         if old_val.x != new_val.x or old_val.y != new_val.y:
             vx, vy = new_val.x - old_val.x, new_val.y - old_val.y
@@ -33,7 +36,6 @@ class ViewScreen(ScatterLayout):
             self.apply_transform(mat)
         if old_val.z != new_val.z:
             pass
-
 
 
 class SpriteLayer(FloatLayout):
@@ -61,6 +63,19 @@ class SpriteLayer(FloatLayout):
         del self.eids[eid]
         self.remove_widget(sprite)
 
+    def move_sprite(self, eid, old_pos, new_pos):
+        sprite = self.eids[eid]
+        vx, vy = new_pos.x - old_pos.x, new_pos.y - old_pos.y
+        sprite.move(vx, vy)
+        self.y_sort[old_pos.x].remove(sprite)
+        if not self.y_sort[old_pos.x]:
+            del self.y_sort[old_pos.x]
+        if sprite.cell_x not in self.y_sort:
+            self.y_sort[sprite.cell_x] = list()
+        self.y_sort[sprite.cell_x].append(sprite)
+        self.y_sort[sprite.cell_x].sort(key=lambda s: s.cell_y, reverse=True)
+        self.reload()
+
     def reload(self):
         self.clear_widgets()
         for x in self.y_sort:
@@ -82,3 +97,10 @@ class Sprite(Image):
         self.x = sx
         self.y = sy + (layer * (int(config.TILE_SIZE // 2)))
         self.source = config.IMG_PATHS[entity.image][layer]
+
+    def move(self, vx, vy):
+        svx, svy = config.transform_to_screen(vx, vy)
+        self.x += svx
+        self.y += svy
+        self.cell_x += vx
+        self.cell_y += vy

@@ -52,6 +52,17 @@ class World(System):
         del block.cell
         del block.sprite
 
+    def move_block(self, block, vx, vy=None, vz=None):
+        vx, vy, vz = get_coor(vx, vy, vz)
+        print(block.cell)
+        try:
+            x, y, z = block.cell.x + vx, block.cell.y + vy, block.cell.z + vz
+            block.cell = x, y, z
+            block.sprite = x, y, z
+        except ValueError:
+            return False
+        return True
+
     def set_thing(self, x, y=None, z=None, **kwargs):
         pos = get_coor(x, y, z)
         thing = self.get_entity(pos=pos, sprite=pos, **kwargs)
