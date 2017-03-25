@@ -1,7 +1,7 @@
 import pickle
 from .ecs import System
+from utils import ObservedPoint
 from utils import CellDict
-from utils import CallbackDict
 from utils import PosDict
 from utils import CallbackCellDict
 import config
@@ -30,7 +30,7 @@ class World(System):
         self["image"] = dict()
         self["sprite"] = CallbackCellDict()
         self["material"] = dict()
-        self.camera = config.CAMERA
+        self.camera = ObservedPoint(0, 0, 0)
         self.player = None
 
     def set_block(self, x, y=None, z=None, **kwargs):

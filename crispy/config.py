@@ -45,12 +45,3 @@ def transform_to_screen(x, y):
     ret_y = y * TILE_SIZE
     return ret_x, ret_y
 
-
-class _Camera:
-    def __init__(self):
-        self.x = 0
-        self.y = 0
-        self.z = 0
-
-
-CAMERA = _Camera()

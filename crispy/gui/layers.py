@@ -1,10 +1,12 @@
 from kivy.app import App
 from kivy.uix.floatlayout import FloatLayout
+from kivy.uix.scatterlayout import ScatterLayout
 from kivy.uix.image import Image
+from kivy.graphics.transformation import Matrix
 import config
 
 
-class ViewScreen(FloatLayout):
+class ViewScreen(ScatterLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.layers = []
@@ -13,10 +15,6 @@ class ViewScreen(FloatLayout):
             self.layers.append(layer)
             self.add_widget(layer)
         self.eids = dict()
-
-    def on_touch_down(self, touch):
-        app = App.get_running_app()
-        app.clicked_view(touch)
 
     def load_sprite(self, entity):
         layer = self.layers[entity.sprite.z]
@@ -27,6 +25,15 @@ class ViewScreen(FloatLayout):
         layer = self.eids[eid]
         layer.remove_sprite(eid)
         del self.eids[eid]
+
+    def move_camera(self, old_val, new_val):
+        if old_val.x != new_val.x or old_val.y != new_val.y:
+            vx, vy = new_val.x - old_val.x, new_val.y - old_val.y
+            mat = Matrix().translate(vx, vy, 0)
+            self.apply_transform(mat)
+        if old_val.z != new_val.z:
+            pass
+
 
 
 class SpriteLayer(FloatLayout):

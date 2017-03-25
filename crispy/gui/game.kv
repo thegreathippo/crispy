@@ -13,37 +13,37 @@
             size: self.size
     size_hint: 1, 0.1
 
-    EditButton:
-        text: "Erase"
-        on_press: app.mode = cons.ERASE_MODE
-    EditButton:
-        text: "Wall"
-        on_press: app.mode = cons.DRAW_WALL_MODE
-    EditButton:
-        text: "Floor"
-        on_press: app.mode = cons.DRAW_FLOOR_MODE
-    EditButton:
-        text: "Roof"
-        on_press: app.mode = cons.DRAW_ROOF_MODE
-    EditButton:
-        text: "Monster"
-        on_press: app.mode = cons.DRAW_MONSTER_MODE
-    EditButton:
-        text: "Player"
-        on_press: app.mode = cons.DRAW_PLAYER_MODE
-    EditButton:
-        text: "Load"
-        on_press: app.world.load()
-    EditButton:
-        text: "Save"
-        on_press: app.world.save()
-    EditButton:
-        text: "Clear"
-        on_press: app.world.clear()
-
 
 <Window>:
     ViewScreen:
         id: view_screen
     Menu:
+        id: menu
 
+        EditButton:
+            text: "Erase"
+            on_press: root.mode = cons.ERASE_MODE
+        EditButton:
+            text: "Wall"
+            on_press: root.mode = cons.DRAW_WALL_MODE
+        EditButton:
+            text: "Floor"
+            on_press: root.mode = cons.DRAW_FLOOR_MODE
+        EditButton:
+            text: "Roof"
+            on_press: root.mode = cons.DRAW_ROOF_MODE
+        EditButton:
+            text: "Monster"
+            on_press: root.mode = cons.DRAW_MONSTER_MODE
+        EditButton:
+            text: "Player"
+            on_press: root.mode = cons.DRAW_PLAYER_MODE
+        EditButton:
+            text: "Load"
+            on_press: app.world.load()
+        EditButton:
+            text: "Save"
+            on_press: app.world.save()
+        EditButton:
+            text: "Clear"
+            on_press: app.world.clear()
