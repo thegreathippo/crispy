@@ -10,7 +10,7 @@ __all__ = ["InternalDict", "CellDict", "PosDict", "CallbackDict", "CallbackPosDi
 
 class InternalDict:
     def __init__(self):
-        self.data = dict()
+        self.data = collections.OrderedDict()
 
     def __getitem__(self, item):
         return self.data[item]

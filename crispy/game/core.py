@@ -4,7 +4,7 @@ from utils import CellDict
 from utils import CallbackDict
 from utils import PosDict
 from utils import CallbackCellDict
-from config import *
+import config
 
 
 class World(System):
@@ -27,21 +27,19 @@ class World(System):
         self.entity_cls = Entity
         self["cell"] = CellDict()
         self["pos"] = PosDict()
-        self["tile"] = CallbackCellDict()
-        self["sprite"] = CallbackDict()
-        self.camera = 0, 0, 0
+        self["image"] = dict()
+        self["sprite"] = CallbackCellDict()
+        self["material"] = dict()
+        self.camera = config.CAMERA
         self.player = None
 
-    def fill(self, *args, material=None):
-        for pos in args:
-            self.set_block(pos, material)
-
-    def set_block(self, x, y=None, z=None, material=None):
+    def set_block(self, x, y=None, z=None, **kwargs):
         pos = get_coor(x, y, z)
         block = self.get_block(x, y, z)
         if block:
             return
-        e = self.get_entity(cell=pos, material=material, tile=pos)
+        e = self.get_entity(cell=pos, **kwargs)
+        e.sprite = pos
         return e
 
     def get_block(self, x, y=None, z=None):
@@ -50,6 +48,15 @@ class World(System):
         if eid is not None:
             return self.get_entity(eid)
 
+    def del_block(self, block):
+        del block.cell
+        del block.sprite
+
+    def set_thing(self, x, y=None, z=None, **kwargs):
+        pos = get_coor(x, y, z)
+        thing = self.get_entity(pos=pos, sprite=pos, **kwargs)
+        return thing
+
     def get_things(self, x, y=None, z=None):
         pos = get_coor(x, y, z)
         eids = self["pos"].reverse.get(pos, set())
@@ -57,7 +64,7 @@ class World(System):
 
     def save(self, path=None):
         if not path:
-            path = DEFAULT_SAVE_PATH
+            path = config.DEFAULT_SAVE_PATH
         save_dict = dict()
         for c in self:
             save_dict[c] = dict(self[c])
@@ -66,12 +73,12 @@ class World(System):
 
     def load(self, path=None):
         if not path:
-            path = DEFAULT_SAVE_PATH
+            path = config.DEFAULT_SAVE_PATH
         self.clear()
         eid_count = 0
         with open(path, "rb") as f:
             data = pickle.load(f)
-            for component in data:
+            for component in self:
                 for eid in data[component]:
                     if eid > eid_count:
                         eid_count = eid
