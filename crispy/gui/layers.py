@@ -98,7 +98,7 @@ class Sprite(Image):
         self.size_hint = None, None
         self.x = sx
         self.y = sy + (layer * (int(config.TILE_SIZE // 2)))
-        self.source = constants.IMG_PATHS[entity.image][layer]
+        self.source = constants.IMG_PATHS[entity.sprite.image][layer]
 
     def move(self, vx, vy):
         svx, svy = utils.transform_to_screen(vx, vy)

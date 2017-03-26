@@ -17,7 +17,7 @@ class BaseEntity:
     def clear(self):
         for component in self.root:
             if hasattr(self, component):
-                del self.component
+                delattr(self, component)
 
     def __getattr__(self, attr):
         try:

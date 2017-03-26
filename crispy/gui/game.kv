@@ -15,8 +15,17 @@
 
 
 <GameWindow>:
+
     ViewScreen:
         id: view_screen
+
+    Label:
+        text_size: root.width, root.height
+        size: self.texture_size
+        text: root.debug_data
+        color: 1, .25, .25, 1
+        valign: "top"
+
     Menu:
         id: menu
         EditButton:
@@ -38,6 +47,9 @@
             text: "Player"
             on_press: root.mode = const.MODE_DRAW_PLAYER
         EditButton:
+            text: "Select"
+            on_press: root.mode = const.MODE_CHANGE_FOCUS
+        EditButton:
             text: "Load"
             on_press: app.world.load()
         EditButton:
@@ -46,9 +58,4 @@
         EditButton:
             text: "Clear"
             on_press: app.world.clear()
-
-    Label:
-        text_size: root.width, None
-        size: self.texture_size
-        text: root.debug_data
 

@@ -24,9 +24,13 @@ class GameApp(App):
 
     def get_debug_data(self):
         data = ""
-        data += " # of Components: {}\n".format(len(self.world))
-        data += " EID Counter:     {}\n".format(self.world.eid_count)
-        data += " # of Cell EIDs:  {}\n".format(len(self.world["cell"]))
+        data += " # of Components:  {}\n".format(len(self.world))
+        data += " EID Counter:      {}\n".format(self.world.eid_count)
+        data += " # of Cell EIDs:   {}\n".format(len(self.world["cell"]))
+        data += " # of Sprite EIDs: {}\n".format(len(self.world["sprite"]))
+        data += " Camera Position:  {}\n".format(self.world.camera.pos)
+        if hasattr(self.world.player, "cell"):
+            data += "Player Position:   {}\n".format(self.world.player.cell)
         return data
 
     def build(self):
@@ -82,26 +86,33 @@ class GameWindow(FloatLayout):
             tx, ty = touch.pos
             sx, sy = tx - cx, ty - cy
             x, y = utils.transform_to_grid(sx, sy)
+
             if self.mode is constants.MODE_DRAW_ROOF:
-                self.world.set_block(x, y, 2, image=constants.IMG_GRANITE)
+                sprite = x, y, 2, constants.IMG_GRANITE
+                self.world.set_block(x, y, 2, sprite=sprite)
             elif self.mode is constants.MODE_DRAW_WALL:
-                self.world.set_block(x, y, 1, image=constants.IMG_GRANITE)
+                sprite = x, y, 1, constants.IMG_GRANITE
+                self.world.set_block(x, y, 1, sprite=sprite)
             elif self.mode is constants.MODE_DRAW_FLOOR:
-                self.world.set_block(x, y, 0, image=constants.IMG_GRANITE)
+                sprite = x, y, 0, constants.IMG_GRANITE
+                self.world.set_block(x, y, 0, sprite=sprite)
             elif self.mode is constants.MODE_DRAW_PLAYER:
                 self.world.player.cell = (x, y, 1)
-                self.world.player.image = constants.IMG_PLAYER
-                self.world.player.sprite = (x, y, 1)
+                self.world.player.sprite = x, y, 1, constants.IMG_PLAYER
             elif self.mode is constants.MODE_DRAW_MONSTER:
-                self.world.set_block(x, y, 1, image=constants.IMG_MONSTER)
-            elif self.mode is constants.MODE_ERASE:
+                sprite = x, y, 1, constants.IMG_MONSTER
+                self.world.set_block(x, y, 1, sprite=sprite)
+            else:
                 block = self.world.get_block(x, y, 2)
                 if block is None:
                     block = self.world.get_block(x, y, 1)
                 if block is None:
                     block = self.world.get_block(x, y, 0)
                 if block:
-                    self.world.del_block(block)
+                    if self.mode is constants.MODE_ERASE:
+                        block.clear()
+                    elif self.mode is constants.MODE_CHANGE_FOCUS:
+                        self.world.focus = block
 
     def moved_view(self, touch):
         if touch.button == "right":
@@ -129,51 +140,51 @@ class GameWindow(FloatLayout):
     def _on_keyboard_down(self, keyboard, keycode, text, modifiers):
         if keycode[0] == 264:
             # North
-            move = self.world.move_block(self.world.player, 0, 1, 0)
+            move = self.world.move_block(self.world.focus, 0, 1, 0)
             if move:
                 self.world.camera.y -= config.TILE_SIZE
         if keycode[0] == 258:
             # South
-            move = self.world.move_block(self.world.player, 0, -1, 0)
+            move = self.world.move_block(self.world.focus, 0, -1, 0)
             if move:
                 self.world.camera.y += config.TILE_SIZE
 
         if keycode[0] == 262:
             # East
-            move = self.world.move_block(self.world.player, 1, 0, 0)
+            move = self.world.move_block(self.world.focus, 1, 0, 0)
             if move:
                 self.world.camera.x -= config.TILE_SIZE
 
         if keycode[0] == 260:
             # West
-            move = self.world.move_block(self.world.player, -1, 0, 0)
+            move = self.world.move_block(self.world.focus, -1, 0, 0)
             if move:
                 self.world.camera.x += config.TILE_SIZE
 
         if keycode[0] == 263:
             # North West
-            move = self.world.move_block(self.world.player, -1, 1, 0)
+            move = self.world.move_block(self.world.focus, -1, 1, 0)
             if move:
                 self.world.camera.x += config.TILE_SIZE
                 self.world.camera.y -= config.TILE_SIZE
 
         if keycode[0] == 265:
             # North East
-            move = self.world.move_block(self.world.player, 1, 1, 0)
+            move = self.world.move_block(self.world.focus, 1, 1, 0)
             if move:
                 self.world.camera.x -= config.TILE_SIZE
                 self.world.camera.y -= config.TILE_SIZE
 
         if keycode[0] == 257:
             # South West
-            move = self.world.move_block(self.world.player, -1, -1, 0)
+            move = self.world.move_block(self.world.focus, -1, -1, 0)
             if move:
                 self.world.camera.x += config.TILE_SIZE
                 self.world.camera.y += config.TILE_SIZE
 
         if keycode[0] == 259:
             # South East
-            move = self.world.move_block(self.world.player, 1, -1, 0)
+            move = self.world.move_block(self.world.focus, 1, -1, 0)
             if move:
                 self.world.camera.x -= config.TILE_SIZE
                 self.world.camera.y += config.TILE_SIZE

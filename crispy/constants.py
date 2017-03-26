@@ -6,7 +6,7 @@ MODE_DRAW_WALL = "draw wall mode"
 MODE_DRAW_PLAYER = "draw player mode"
 MODE_DRAW_MONSTER = "draw monster mode"
 MODE_DRAW_ROOF = "draw roof mode"
-
+MODE_CHANGE_FOCUS = "change focus mode"
 
 IMG_GRANITE = "img_granite"
 IMG_PLAYER = "img_player"

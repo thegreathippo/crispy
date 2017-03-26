@@ -1,11 +1,13 @@
+
 import collections
 import inspect
 
 NULL = object()
 Point3 = collections.namedtuple("Point3", ["x", "y", "z"])
+Sprite3 = collections.namedtuple("Sprite3", ["x", "y", "z", "image"])
 
 __all__ = ["InternalDict", "CellDict", "PosDict", "CallbackDict", "CallbackPosDict",
-           "CallbackCellDict"]
+           "CallbackCellDict", "SpriteDict"]
 
 
 class InternalDict:
@@ -176,6 +178,9 @@ class CallbackPosDict(PosDict, CallbackDict):
 
 class CallbackCellDict(CellDict, CallbackDict):
     pass
+
+class SpriteDict(CallbackCellDict):
+    value_cls = Sprite3
 
 
 def required_num_of_args(sig):
