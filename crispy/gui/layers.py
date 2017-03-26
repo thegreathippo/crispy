@@ -4,7 +4,7 @@ from kivy.uix.image import Image
 from kivy.graphics.transformation import Matrix
 import utils
 import config
-import const
+import constants
 
 
 class ViewScreen(ScatterLayout):
@@ -98,7 +98,7 @@ class Sprite(Image):
         self.size_hint = None, None
         self.x = sx
         self.y = sy + (layer * (int(config.TILE_SIZE // 2)))
-        self.source = const.IMG_PATHS[entity.image][layer]
+        self.source = constants.IMG_PATHS[entity.image][layer]
 
     def move(self, vx, vy):
         svx, svy = utils.transform_to_screen(vx, vy)

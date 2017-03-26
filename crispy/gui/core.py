@@ -4,8 +4,10 @@ from kivy.app import App
 from kivy.uix.floatlayout import FloatLayout
 from kivy.config import Config
 from kivy.core.window import Window
+from kivy.properties import StringProperty
+from kivy.clock import Clock
 import utils
-import const
+import constants
 import config
 
 
@@ -20,8 +22,20 @@ class GameApp(App):
         super().__init__()
         self.world = world
 
+    def get_debug_data(self):
+        data = ""
+        data += " # of Components: {}\n".format(len(self.world))
+        data += " EID Counter:     {}\n".format(self.world.eid_count)
+        data += " # of Cell EIDs:  {}\n".format(len(self.world["cell"]))
+        return data
+
     def build(self):
         window = GameWindow(self.world)
+
+        def get_debug_data(dt):
+            window.debug_data = self.get_debug_data()
+
+        Clock.schedule_interval(get_debug_data, 0.1)
         return window
 
     def clicked_view(self, touch):
@@ -29,6 +43,7 @@ class GameApp(App):
 
 
 class GameWindow(FloatLayout):
+    debug_data = StringProperty()
 
     def __init__(self, world, **kwargs):
         super().__init__(**kwargs)
@@ -67,17 +82,19 @@ class GameWindow(FloatLayout):
             tx, ty = touch.pos
             sx, sy = tx - cx, ty - cy
             x, y = utils.transform_to_grid(sx, sy)
-            if self.mode is const.DRAW_ROOF_MODE:
-                self.world.set_block(x, y, 2, image=const.IMG_GRANITE)
-            elif self.mode is const.DRAW_WALL_MODE:
-                self.world.set_block(x, y, 1, image=const.IMG_GRANITE)
-            elif self.mode is const.DRAW_FLOOR_MODE:
-                self.world.set_block(x, y, 0, image=const.IMG_GRANITE)
-            elif self.mode is const.DRAW_PLAYER_MODE:
-                self.world.player = self.world.set_block(x, y, 1, image=const.IMG_PLAYER)
-            elif self.mode is const.DRAW_MONSTER_MODE:
-                self.world.set_block(x, y, 1, image=const.IMG_MONSTER)
-            elif self.mode is const.ERASE_MODE:
+            if self.mode is constants.MODE_DRAW_ROOF:
+                self.world.set_block(x, y, 2, image=constants.IMG_GRANITE)
+            elif self.mode is constants.MODE_DRAW_WALL:
+                self.world.set_block(x, y, 1, image=constants.IMG_GRANITE)
+            elif self.mode is constants.MODE_DRAW_FLOOR:
+                self.world.set_block(x, y, 0, image=constants.IMG_GRANITE)
+            elif self.mode is constants.MODE_DRAW_PLAYER:
+                self.world.player.cell = (x, y, 1)
+                self.world.player.image = constants.IMG_PLAYER
+                self.world.player.sprite = (x, y, 1)
+            elif self.mode is constants.MODE_DRAW_MONSTER:
+                self.world.set_block(x, y, 1, image=constants.IMG_MONSTER)
+            elif self.mode is constants.MODE_ERASE:
                 block = self.world.get_block(x, y, 2)
                 if block is None:
                     block = self.world.get_block(x, y, 1)

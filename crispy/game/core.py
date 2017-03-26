@@ -31,7 +31,7 @@ class World(System):
         self["sprite"] = CallbackCellDict()
         self["material"] = dict()
         self.camera = ObservedPoint(0, 0, 0)
-        self.player = None
+        self.player = self.get_entity()
 
     def set_block(self, x, y=None, z=None, **kwargs):
         pos = get_coor(x, y, z)

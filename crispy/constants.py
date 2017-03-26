@@ -1,9 +1,11 @@
-ERASE_MODE = "erase mode"
-DRAW_FLOOR_MODE = "draw floor mode"
-DRAW_WALL_MODE = "draw wall mode"
-DRAW_PLAYER_MODE = "draw player mode"
-DRAW_MONSTER_MODE = "draw monster mode"
-DRAW_ROOF_MODE = "draw roof mode"
+ENTITY_PLAYER = 0
+
+MODE_ERASE = "erase mode"
+MODE_DRAW_FLOOR = "draw floor mode"
+MODE_DRAW_WALL = "draw wall mode"
+MODE_DRAW_PLAYER = "draw player mode"
+MODE_DRAW_MONSTER = "draw monster mode"
+MODE_DRAW_ROOF = "draw roof mode"
 
 
 IMG_GRANITE = "img_granite"

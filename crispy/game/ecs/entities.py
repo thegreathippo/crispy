@@ -14,6 +14,11 @@ class BaseEntity:
         for key in kwargs:
             setattr(self, key, kwargs[key])
 
+    def clear(self):
+        for component in self.root:
+            if hasattr(self, component):
+                del self.component
+
     def __getattr__(self, attr):
         try:
             value = self.root[attr][self.eid]
