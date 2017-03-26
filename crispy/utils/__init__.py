@@ -1,7 +1,21 @@
 from .customdicts import *
 import collections
+import config
+
 
 Point3 = collections.namedtuple("Point3", ["x", "y", "z"])
+
+
+def transform_to_grid(x, y):
+    ret_x = int(x // config.TILE_SIZE)
+    ret_y = int(y // config.TILE_SIZE)
+    return ret_x, ret_y
+
+
+def transform_to_screen(x, y):
+    ret_x = x * config.TILE_SIZE
+    ret_y = y * config.TILE_SIZE
+    return ret_x, ret_y
 
 
 class ObservedPoint:

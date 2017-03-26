@@ -4,6 +4,8 @@ from kivy.app import App
 from kivy.uix.floatlayout import FloatLayout
 from kivy.config import Config
 from kivy.core.window import Window
+import utils
+import const
 import config
 
 
@@ -64,18 +66,18 @@ class GameWindow(FloatLayout):
             cx, cy = self.world.camera.x, self.world.camera.y
             tx, ty = touch.pos
             sx, sy = tx - cx, ty - cy
-            x, y = config.transform_to_grid(sx, sy)
-            if self.mode is config.DRAW_ROOF_MODE:
-                self.world.set_block(x, y, 2, image=config.IMG_GRANITE)
-            elif self.mode is config.DRAW_WALL_MODE:
-                self.world.set_block(x, y, 1, image=config.IMG_GRANITE)
-            elif self.mode is config.DRAW_FLOOR_MODE:
-                self.world.set_block(x, y, 0, image=config.IMG_GRANITE)
-            elif self.mode is config.DRAW_PLAYER_MODE:
-                self.world.player = self.world.set_block(x, y, 1, image=config.IMG_PLAYER)
-            elif self.mode is config.DRAW_MONSTER_MODE:
-                self.world.set_block(x, y, 1, image=config.IMG_MONSTER)
-            elif self.mode is config.ERASE_MODE:
+            x, y = utils.transform_to_grid(sx, sy)
+            if self.mode is const.DRAW_ROOF_MODE:
+                self.world.set_block(x, y, 2, image=const.IMG_GRANITE)
+            elif self.mode is const.DRAW_WALL_MODE:
+                self.world.set_block(x, y, 1, image=const.IMG_GRANITE)
+            elif self.mode is const.DRAW_FLOOR_MODE:
+                self.world.set_block(x, y, 0, image=const.IMG_GRANITE)
+            elif self.mode is const.DRAW_PLAYER_MODE:
+                self.world.player = self.world.set_block(x, y, 1, image=const.IMG_PLAYER)
+            elif self.mode is const.DRAW_MONSTER_MODE:
+                self.world.set_block(x, y, 1, image=const.IMG_MONSTER)
+            elif self.mode is const.ERASE_MODE:
                 block = self.world.get_block(x, y, 2)
                 if block is None:
                     block = self.world.get_block(x, y, 1)

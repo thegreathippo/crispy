@@ -1,5 +1,5 @@
 #: kivy 1.0.9
-#: import cons config
+#: import const const
 
 <EditButton@Button>:
     size_hint: 0.05, .5
@@ -22,22 +22,22 @@
 
         EditButton:
             text: "Erase"
-            on_press: root.mode = cons.ERASE_MODE
+            on_press: root.mode = const.ERASE_MODE
         EditButton:
             text: "Wall"
-            on_press: root.mode = cons.DRAW_WALL_MODE
+            on_press: root.mode = const.DRAW_WALL_MODE
         EditButton:
             text: "Floor"
-            on_press: root.mode = cons.DRAW_FLOOR_MODE
+            on_press: root.mode = const.DRAW_FLOOR_MODE
         EditButton:
             text: "Roof"
-            on_press: root.mode = cons.DRAW_ROOF_MODE
+            on_press: root.mode = const.DRAW_ROOF_MODE
         EditButton:
             text: "Monster"
-            on_press: root.mode = cons.DRAW_MONSTER_MODE
+            on_press: root.mode = const.DRAW_MONSTER_MODE
         EditButton:
             text: "Player"
-            on_press: root.mode = cons.DRAW_PLAYER_MODE
+            on_press: root.mode = const.DRAW_PLAYER_MODE
         EditButton:
             text: "Load"
             on_press: app.world.load()

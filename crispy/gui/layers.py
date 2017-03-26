@@ -2,7 +2,9 @@ from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.scatterlayout import ScatterLayout
 from kivy.uix.image import Image
 from kivy.graphics.transformation import Matrix
+import utils
 import config
+import const
 
 
 class ViewScreen(ScatterLayout):
@@ -87,7 +89,7 @@ class Sprite(Image):
     def __init__(self, entity, layer):
         super().__init__()
         data = entity.sprite
-        sx, sy = config.transform_to_screen(data.x, data.y)
+        sx, sy = utils.transform_to_screen(data.x, data.y)
         self.cell_x = data.x
         self.cell_y = data.y
         self.cell_z = data.z
@@ -96,10 +98,10 @@ class Sprite(Image):
         self.size_hint = None, None
         self.x = sx
         self.y = sy + (layer * (int(config.TILE_SIZE // 2)))
-        self.source = config.IMG_PATHS[entity.image][layer]
+        self.source = const.IMG_PATHS[entity.image][layer]
 
     def move(self, vx, vy):
-        svx, svy = config.transform_to_screen(vx, vy)
+        svx, svy = utils.transform_to_screen(vx, vy)
         self.x += svx
         self.y += svy
         self.cell_x += vx
