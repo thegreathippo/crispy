@@ -6,6 +6,7 @@ from utils import PosDict
 from utils import SpriteDict
 import config
 import constants
+import random
 
 
 class World(System):
@@ -14,6 +15,7 @@ class World(System):
         super().__init__()
         self.eid_count = constants.EID_START_COUNT
         self._focus = constants.EID_PLAYER
+        self._turn = constants.EID_PLAYER
 
         class Entity(self.entity_cls, GameObject):
             pass
@@ -24,12 +26,16 @@ class World(System):
         self["sprite"] = SpriteDict()
         self["material"] = dict()
         self["initiative"] = dict()
-        self.player.cell = 0, 0, 0
         self.setup()
 
     def setup(self):
+        self.player.initiative = 0
         self.focus = self.player
-        self.camera.pos = self.focus.cell
+        self.camera.pos = 0, 0, 0
+
+    @property
+    def null(self):
+        return self.get_entity(constants.EID_NULL)
 
     @property
     def player(self):
@@ -47,6 +53,27 @@ class World(System):
     def focus(self, entity_or_eid):
         eid = get_eid(entity_or_eid)
         self._focus = eid
+
+    @property
+    def turn(self):
+        return self.get_entity(self._turn)
+
+    @turn.setter
+    def turn(self, entity_or_eid):
+        eid = get_eid(entity_or_eid)
+        self._turn = eid
+
+    def spin(self, *args):
+        total_spins = 0
+        if self.turn != self.null:
+            if self.turn.initiative < 0:
+                self.turn = constants.EID_NULL
+        while self.turn != self.focus:
+            self()
+            total_spins += 1
+            if total_spins > 100:
+                print("SHIT")
+                break
 
     def set_block(self, x, y=None, z=None, **kwargs):
         pos = get_coor(x, y, z)
@@ -72,6 +99,8 @@ class World(System):
             block.sprite = x, y, z, block.sprite.image
         except ValueError:
             return False
+        if hasattr(block, "initiative"):
+            block.initiative -= random.randint(5, 10)
         return True
 
     def save(self, path=None):
@@ -102,7 +131,6 @@ class World(System):
                     translated_eid = eid_translation[eid]
                     self[component][translated_eid] = data[component][eid]
         self.eid_count = eid_count
-        self.setup()
 
     def clear(self, entity=None):
         if entity is not None:
@@ -115,6 +143,7 @@ class World(System):
             for component in self:
                 self[component].clear()
             self.eid_count = constants.EID_START_COUNT
+            self.setup()
 
 
 def get_coor(x, y=None, z=None):

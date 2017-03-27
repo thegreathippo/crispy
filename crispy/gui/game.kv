@@ -50,6 +50,9 @@
             text: "Select"
             on_press: root.mode = const.MODE_CHANGE_FOCUS
         EditButton:
+            text: "Root-Data"
+            on_press: print(root.world)
+        EditButton:
             text: "Load"
             on_press: app.world.load()
         EditButton:

@@ -21,6 +21,7 @@ class GameApp(App):
         data += " # of Sprite EIDs: {}\n".format(len(self.world["sprite"]))
         data += " Player EID:       {}\n".format(self.world.player.eid)
         data += " Focus EID:        {}\n".format(self.world.focus.eid)
+        data += " Player In:        {}\n".format(self.world.player.initiative)
         if hasattr(self.world.player, "cell"):
             data += " Player Cell:   {}\n".format(self.world.player.cell)
         if hasattr(self.world.camera, "pos"):
@@ -33,15 +34,8 @@ class GameApp(App):
         def get_debug_data(*args):
             window.debug_data = self.get_debug_data()
 
-        def spin_world(*args):
-            world = self.world
-            total_spins = 0
-            while total_spins > 0:
-                world()
-                total_spins += 1
-
         utils.schedule_interval(get_debug_data, 0.1)
-        utils.schedule_interval(spin_world, 0)
+        utils.schedule_interval(self.world.spin, 0)
         return window
 
 
