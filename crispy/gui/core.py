@@ -123,6 +123,8 @@ class GameWindow(FloatLayout):
         self._keyboard = None
 
     def _on_keyboard_down(self, keyboard, keycode, text, modifiers):
+        if keycode[0] == 261:
+            self.world.focus.initiative -= 10
         if keycode[0] == 264:
             # North
             move = self.world.move_block(self.world.focus, 0, 1, 0)

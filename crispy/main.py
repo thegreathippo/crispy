@@ -12,12 +12,22 @@ def gain_initiative(entity):
     elif world.turn == entity:
         world.turn = world.null
 
+moves = [
+    (1, 0),
+    (0, 1),
+    (1, 1),
+    (-1, 0),
+    (0, -1),
+    (-1, -1),
+    (1, -1),
+    (-1, 1)
+]
 
 def expend_turn(entity):
     if entity == world.turn and entity != world.focus:
-        vx, vy = random.randint(-1, 1), random.randint(-1, 1)
+        vx, vy = random.choice(moves)
         world.move_block(entity, vx, vy, 0)
-        entity.initiative -= random.randint(5, 10)
+        print("{0} moved {1}, {2}".format(entity.eid, vx, vy))
 
 
 world.register_process(gain_initiative, "initiative")
