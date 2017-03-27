@@ -1,9 +1,21 @@
 from .customdicts import *
+from .bases import *
 import collections
 import config
+import kivy
+from kivy.config import Config
+from kivy.clock import Clock
+from kivy.core.window import Window
+
+kivy.require("1.9.0")
+Config.set('input', 'mouse', 'mouse,multitouch_on_demand')
 
 
 Point3 = collections.namedtuple("Point3", ["x", "y", "z"])
+
+
+def schedule_interval(func, time=0):
+    Clock.schedule_interval(func, time)
 
 
 def transform_to_grid(x, y):
@@ -18,50 +30,27 @@ def transform_to_screen(x, y):
     return ret_x, ret_y
 
 
-class ObservedPoint:
+def get_size_in_cells():
+    sx, sy = Window.system_size
+    width = int(sx // config.TILE_SIZE)
+    height = int(sy // config.TILE_SIZE)
+    return width, height
 
-    def __init__(self, x=0, y=0, z=0):
-        self._x = x
-        self._y = y
-        self._z = z
-        self.observers = list()
 
-    def register(self, func):
-        self.observers.append(func)
+def get_touched_cell(pos, camera):
+    t_x, t_y = pos
+    c_u, c_v = camera.x, camera.y
+    t_u, t_v = transform_to_grid(t_x, t_y)
+    size = get_size_in_cells()
+    w, h = int(size[0] // 2), int(size[1] // 2)
+    d_x, d_y = c_u - w, c_v - h
+    return t_u + d_x, t_v + d_y
 
-    @property
-    def pos(self):
-        return Point3(self.x, self.y, self.z)
 
-    @property
-    def x(self):
-        return self._x
-
-    @x.setter
-    def x(self, x):
-        old_pos = self.pos
-        self._x = int(x)
-        for observer in self.observers:
-            observer(old_pos, self.pos)
-
-    @property
-    def y(self):
-        return self._y
-
-    @y.setter
-    def y(self, y):
-        old_pos = self.pos
-        self._y = int(y)
-        for observer in self.observers:
-            observer(old_pos, self.pos)
-
-    @property
-    def z(self):
-        return self._z
-
-    @z.setter
-    def z(self, z):
-        old_pos = self.pos
-        self._z = int(z)
-        for observer in self.observers:
-            observer(old_pos, self.pos)
+def get_centered_camera(x, y):
+    sx, sy = Window.system_size
+    d_x = int((sx // config.TILE_SIZE) // 2)
+    d_y = int((sy // config.TILE_SIZE) // 2)
+    center_x = x - d_x
+    center_y = y - d_y
+    return center_x, center_y

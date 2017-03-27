@@ -1,10 +1,8 @@
-
+from utils.bases import Point3, Sprite3
 import collections
 import inspect
 
 NULL = object()
-Point3 = collections.namedtuple("Point3", ["x", "y", "z"])
-Sprite3 = collections.namedtuple("Sprite3", ["x", "y", "z", "image"])
 
 __all__ = ["InternalDict", "CellDict", "PosDict", "CallbackDict", "CallbackPosDict",
            "CallbackCellDict", "SpriteDict"]

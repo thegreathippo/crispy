@@ -15,9 +15,7 @@ class BaseEntity:
             setattr(self, key, kwargs[key])
 
     def clear(self):
-        for component in self.root:
-            if hasattr(self, component):
-                delattr(self, component)
+        self.root.clear(self)
 
     def __getattr__(self, attr):
         try:

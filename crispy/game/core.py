@@ -1,6 +1,6 @@
 import pickle
 from .ecs import System
-from utils import ObservedPoint
+from .objects import GameObject
 from utils import CellDict
 from utils import PosDict
 from utils import SpriteDict
@@ -12,27 +12,32 @@ class World(System):
 
     def __init__(self):
         super().__init__()
+        self.eid_count = constants.EID_START_COUNT
+        self._focus = constants.EID_PLAYER
 
-        class Entity(self.entity_cls):
-            @property
-            def x(self):
-                return self.pos[0]
+        class Entity(self.entity_cls, GameObject):
+            pass
 
-            @property
-            def y(self):
-                return self.pos[1]
-
-            @property
-            def z(self):
-                return self.pos[2]
         self.entity_cls = Entity
         self["cell"] = CellDict()
         self["pos"] = PosDict()
         self["sprite"] = SpriteDict()
         self["material"] = dict()
-        self.camera = ObservedPoint(0, 0, 0)
-        self.player = self.get_entity()
-        self._focus = self.player.eid
+        self["initiative"] = dict()
+        self.player.cell = 0, 0, 0
+        self.setup()
+
+    def setup(self):
+        self.focus = self.player
+        self.camera.pos = self.focus.cell
+
+    @property
+    def player(self):
+        return self.get_entity(constants.EID_PLAYER)
+
+    @property
+    def camera(self):
+        return self.get_entity(constants.EID_CAMERA)
 
     @property
     def focus(self):
@@ -40,10 +45,7 @@ class World(System):
 
     @focus.setter
     def focus(self, entity_or_eid):
-        if hasattr(entity_or_eid, "eid"):
-            eid = entity_or_eid.eid
-        else:
-            eid = entity_or_eid
+        eid = get_eid(entity_or_eid)
         self._focus = eid
 
     def set_block(self, x, y=None, z=None, **kwargs):
@@ -67,7 +69,7 @@ class World(System):
         try:
             x, y, z = block.cell.x + vx, block.cell.y + vy, block.cell.z + vz
             block.cell = x, y, z
-            block.sprite = x, y, z, constants.IMG_GRANITE
+            block.sprite = x, y, z, block.sprite.image
         except ValueError:
             return False
         return True
@@ -82,11 +84,14 @@ class World(System):
             pickle.dump(save_dict, f, pickle.HIGHEST_PROTOCOL)
 
     def load(self, path=None):
+        # note: The purpose of eid_translation is to 'clear out' unused eids (which occur when we clear eids).
+        # however, the first few EIDs are reserved for special objects, hence why the translator starts with
+        # a special dictionary (EID_TRANSLATION)
         if not path:
             path = config.DEFAULT_SAVE_PATH
         self.clear()
-        eid_count = 1
-        eid_translation = {0: 0} # 0 is always player
+        eid_translation = dict(constants.EID_TRANSLATION)
+        eid_count = constants.EID_START_COUNT
         with open(path, "rb") as f:
             data = pickle.load(f)
             for component in self:
@@ -97,13 +102,19 @@ class World(System):
                     translated_eid = eid_translation[eid]
                     self[component][translated_eid] = data[component][eid]
         self.eid_count = eid_count
+        self.setup()
 
-    def clear(self):
-        for component in self:
-            self[component].clear()
-        self.eid_count = 0
-        self.player = self.get_entity()
-        self.focus = self.player
+    def clear(self, entity=None):
+        if entity is not None:
+            for component in self:
+                try:
+                    del self[component][entity.eid]
+                except KeyError:
+                    continue
+        else:
+            for component in self:
+                self[component].clear()
+            self.eid_count = constants.EID_START_COUNT
 
 
 def get_coor(x, y=None, z=None):
@@ -112,5 +123,12 @@ def get_coor(x, y=None, z=None):
     else:
         return x
 
+
+def get_eid(entity_or_eid):
+    if hasattr(entity_or_eid, "eid"):
+        eid = entity_or_eid.eid
+    else:
+        eid = entity_or_eid
+    return eid
 
 world = World()

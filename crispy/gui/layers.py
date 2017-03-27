@@ -16,6 +16,7 @@ class ViewScreen(ScatterLayout):
             self.layers.append(layer)
             self.add_widget(layer)
         self.eids = dict()
+        self.camera = utils.Point3(0, 0, 0)
 
     def load_sprite(self, entity):
         layer = self.layers[entity.sprite.z]
@@ -31,12 +32,21 @@ class ViewScreen(ScatterLayout):
         layer = self.eids[eid]
         layer.move_sprite(eid, old_pos, new_pos)
 
-    def move_camera(self, old_val, new_val):
-        if old_val.x != new_val.x or old_val.y != new_val.y:
-            vx, vy = new_val.x - old_val.x, new_val.y - old_val.y
-            mat = Matrix().translate(vx, vy, 0)
-            self.apply_transform(mat)
-        if old_val.z != new_val.z:
+    def follow_camera(self, camera):
+        x, y = utils.get_centered_camera(camera.x, camera.y)
+        sx, sy = utils.transform_to_screen(x, y)
+        z, sz = camera.z, camera.z
+        if (sx, sy, sz) != self.camera:
+            dx = self.camera.x - sx
+            dy = self.camera.y - sy
+            dz = self.camera.z - sz
+            self.adjust_camera(dx, dy, dz)
+            self.camera = utils.Point3(sx, sy, sz)
+
+    def adjust_camera(self, dx, dy, dz):
+        mat = Matrix().translate(dx, dy, 0)
+        self.apply_transform(mat)
+        if dz:
             pass
 
 

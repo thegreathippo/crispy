@@ -1,4 +1,13 @@
-ENTITY_PLAYER = 0
+EID_PLAYER = 0
+EID_CAMERA = 1
+
+EID_TRANSLATION = {
+    0: EID_PLAYER,
+    1: EID_CAMERA
+}
+
+EID_START_COUNT = len(EID_TRANSLATION) + 1
+
 
 MODE_ERASE = "erase mode"
 MODE_DRAW_FLOOR = "draw floor mode"
@@ -7,6 +16,8 @@ MODE_DRAW_PLAYER = "draw player mode"
 MODE_DRAW_MONSTER = "draw monster mode"
 MODE_DRAW_ROOF = "draw roof mode"
 MODE_CHANGE_FOCUS = "change focus mode"
+
+MAX_SPINS = 100
 
 IMG_GRANITE = "img_granite"
 IMG_PLAYER = "img_player"
