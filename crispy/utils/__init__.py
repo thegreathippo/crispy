@@ -15,7 +15,10 @@ Point3 = collections.namedtuple("Point3", ["x", "y", "z"])
 
 
 def schedule_interval(func, time=0):
-    Clock.schedule_interval(func, time)
+    def schedule_once(*args):
+        Clock.schedule_once(func, -1)
+    Clock.schedule_interval(schedule_once, 0)
+
 
 
 def transform_to_grid(x, y):

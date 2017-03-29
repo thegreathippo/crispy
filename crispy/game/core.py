@@ -72,7 +72,7 @@ class World(System):
             self()
             total_spins += 1
             if total_spins > 100:
-                print("SHIT")
+                raise RuntimeError("Maximum spins exceeded ({})".format(total_spins))
                 break
 
     def set_block(self, x, y=None, z=None, **kwargs):
@@ -100,7 +100,7 @@ class World(System):
         except ValueError:
             return False
         if hasattr(block, "initiative"):
-            block.initiative -= random.randint(5, 10)
+            block.initiative -= 5
         return True
 
     def save(self, path=None):

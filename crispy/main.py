@@ -27,7 +27,6 @@ def expend_turn(entity):
     if entity == world.turn and entity != world.focus:
         vx, vy = random.choice(moves)
         world.move_block(entity, vx, vy, 0)
-        print("{0} moved {1}, {2}".format(entity.eid, vx, vy))
 
 
 world.register_process(gain_initiative, "initiative")
