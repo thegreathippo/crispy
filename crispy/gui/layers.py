@@ -50,49 +50,57 @@ class ViewScreen(ScatterLayout):
             pass
 
 
+class LayerManager:
+
+    def __init__(self, widget):
+        self.add_widget = widget.add_widget
+        self.remove_widget = widget.remove_widget
+        self.children = widget.children
+        self.layers = dict()
+
+    def add(self, widget, layer):
+        self.layers[widget] = layer
+        if len(self.children) == 0:
+            self.add_widget(widget)
+            return
+        else:
+            for i, element in enumerate(list(self.children)):
+                if self.layers[element] > layer:
+                    self.add_widget(widget, i)
+                    return
+        self.add_widget(widget, len(self.children))
+
+    def move(self, widget, layer):
+        self.remove_widget(widget)
+        self.add(widget, layer)
+
+    def remove(self, widget):
+        self.remove_widget(widget)
+        del self.layers[widget]
+
+
 class SpriteLayer(FloatLayout):
 
     def __init__(self, z, **kwargs):
         super().__init__(**kwargs)
         self.z = z
-        self.y_sort = dict()
         self.eids = dict()
+        self.layers = LayerManager(self)
 
     def add_sprite(self, entity):
         sprite = Sprite(entity, self.z)
-        if sprite.cell_x not in self.y_sort:
-            self.y_sort[sprite.cell_x] = list()
-        self.y_sort[sprite.cell_x].append(sprite)
-        self.y_sort[sprite.cell_x].sort(key=lambda s: s.cell_y, reverse=True)
-        self.reload()
+        self.layers.add(sprite, entity.y)
         self.eids[entity.eid] = sprite
 
     def remove_sprite(self, eid):
         sprite = self.eids[eid]
-        self.y_sort[sprite.cell_x].remove(sprite)
-        if not self.y_sort[sprite.cell_x]:
-            del self.y_sort[sprite.cell_x]
-        del self.eids[eid]
-        self.remove_widget(sprite)
+        self.layers.remove(sprite)
 
     def move_sprite(self, eid, old_pos, new_pos):
         sprite = self.eids[eid]
         vx, vy = new_pos.x - old_pos.x, new_pos.y - old_pos.y
         sprite.move(vx, vy)
-        self.y_sort[old_pos.x].remove(sprite)
-        if not self.y_sort[old_pos.x]:
-            del self.y_sort[old_pos.x]
-        if sprite.cell_x not in self.y_sort:
-            self.y_sort[sprite.cell_x] = list()
-        self.y_sort[sprite.cell_x].append(sprite)
-        self.y_sort[sprite.cell_x].sort(key=lambda s: s.cell_y, reverse=True)
-        self.reload()
-
-    def reload(self):
-        self.clear_widgets()
-        for x in self.y_sort:
-            for s in self.y_sort[x]:
-                self.add_widget(s)
+        self.layers.move(sprite, new_pos.y)
 
 
 class Sprite(Image):
