@@ -33,6 +33,7 @@ class World(ProcessManager):
         self["cell"] = CellDict()
         self["pos"] = PosDict()
         self["sprite"] = SpriteDict()
+        self["energy"] = dict()
         self.clear()
 
 
@@ -56,34 +57,19 @@ class World(ProcessManager):
     def spin(self, *args):
         self()
 
-    def set_block(self, x, y=None, z=None, **kwargs):
+    def set_cell(self, x, y=None, z=None, **kwargs):
         pos = get_coor(x, y, z)
-        block = self.get_block(x, y, z)
-        if block:
+        cell = self.get_cell(x, y, z)
+        if cell:
             return
         e = self.get_entity(cell=pos, **kwargs)
         return e
 
-    def get_block(self, x, y=None, z=None):
+    def get_cell(self, x, y=None, z=None):
         pos = get_coor(x, y, z)
         eid = self["cell"].inverse.get(pos, None)
         if eid is not None:
             return self.get_entity(eid)
-
-    def move_block(self, block, vx, vy=None, vz=None):
-        # this method is actually static; we can eventually move it
-        # elsewhere
-        vx, vy, vz = get_coor(vx, vy, vz)
-        try:
-            x, y, z = block.cell[0] + vx, block.cell[1] + vy, block.cell[2] + vz
-            block.cell = x, y, z
-            try:
-                block.sprite = x, y, z, block.sprite[3]
-            except AttributeError:
-                pass
-        except ValueError:
-            return False
-        return True
 
     def clear(self, entity=None):
         super().clear(entity)

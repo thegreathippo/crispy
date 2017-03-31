@@ -1,18 +1,10 @@
 TILE_SIZE = 16
 SPRITE_SIZE = TILE_SIZE, TILE_SIZE + (TILE_SIZE // 2)
 
-DEFAULT_SAVE_PATH = "game.pkl"
-
-
 EID_NULL = 0
 EID_PLAYER = 1
 EID_CAMERA = 2
 
-EID_TRANSLATION = {
-    0: EID_NULL,
-    1: EID_PLAYER,
-    2: EID_CAMERA
-}
 
 INPUT_NORTH = object()
 INPUT_SOUTH = object()
@@ -32,7 +24,8 @@ DIRECTIONS = {
     INPUT_NORTH_EAST: (1, 1, 0),
     INPUT_NORTH_WEST: (-1, 1, 0),
     INPUT_SOUTH_EAST: (1, -1, 0),
-    INPUT_SOUTH_WEST: (-1, -1, 0)
+    INPUT_SOUTH_WEST: (-1, -1, 0),
+    INPUT_NONE: (0, 0, 0)
 }
 
 EDIT_MODE_ERASE = "edit erase mode"

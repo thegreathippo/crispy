@@ -57,11 +57,11 @@ class GameWindow(kvy.KeyboardWidget, kvy.FloatLayout):
 
     def on_input(self, user_input):
         vx, vy, vz = constants.DIRECTIONS[user_input]
-        player = self.world.player
-        x, y, z = player.x + vx, player.y + vy, player.z + vz
+        focus = self.world.focus
+        x, y, z = focus.x + vx, focus.y + vy, focus.z + vz
         try:
-            player.cell = x, y, z
-            player.sprite = x, y, z, player.sprite.image
+            focus.cell = x, y, z
+            focus.sprite = x, y, z, focus.sprite.image
         except ValueError:
             pass
 
@@ -73,13 +73,16 @@ class GameWindow(kvy.KeyboardWidget, kvy.FloatLayout):
             elif self.mode == constants.EDIT_MODE_MONSTER:
                 image = constants.IMG_MONSTER
             sprite = x, y, z, image
-            self.world.set_block(x, y, z, sprite=sprite)
+            self.world.set_cell(x, y, z, sprite=sprite)
         elif self.mode == constants.EDIT_MODE_PLAYER:
             self.world.player.cell = x, y, z
             sprite = x, y, z, constants.IMG_PLAYER
             self.world.player.sprite = sprite
-        elif self.mode == constants.EDIT_MODE_ERASE and block:
-            block.clear()
+        elif block:
+            if self.mode == constants.EDIT_MODE_ERASE:
+                block.clear()
+            elif self.mode == constants.EDIT_MODE_SELECT:
+                self.world.focus = block
 
     def on_touch_down(self, touch):
         if self.menu.collide_point(*touch.pos):
@@ -87,7 +90,7 @@ class GameWindow(kvy.KeyboardWidget, kvy.FloatLayout):
         else:
             x, y = kvy.get_touched_cell(touch.pos, self.world.camera.pos)
             z = self.world.camera.z
-            block = self.world.get_block(x, y, z)
-            if not block:
-                block = self.world.get_block(x, y, z - 1)
-            self.on_tap(x, y, z, block)
+            cell = self.world.get_cell(x, y, z)
+            if not cell:
+                cell = self.world.get_cell(x, y, z - 1)
+            self.on_tap(x, y, z, cell)
