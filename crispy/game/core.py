@@ -41,6 +41,7 @@ class World(ProcessManager):
         self["melee_damage"] = dict()
         self["armor_class"] = dict()
         self["hp"] = dict()
+        self["max_hp"] = dict()
         self.clear()
 
 
@@ -96,16 +97,14 @@ class World(ProcessManager):
                 result = Melee(attacker=entity, weapon=entity, target=cell)
                 print("Attack")
                 print("Rolled: {}".format(result.check.roll))
-                print("({0}/{1}/{2})".format(result.check._first, result.check._low, result.check._high))
                 print("Bonus:  {}".format(result.check.bonus))
                 print("Total:  {}".format(result.check.get_total()))
                 print("DC:     {}".format(result.check.dc))
                 print()
-                print("HP:  {0}/{1}".format(cell.hp, 10))
+                print("HP:  {0}/{1}".format(cell.hp, cell.max_hp))
                 print()
                 print("Dice:   {}".format(result.dicepool.get_roll()))
-            else:
-                entity.energy -= 5
+            entity.energy -= 5
 
     def clear(self, entity=None):
         super().clear(entity)

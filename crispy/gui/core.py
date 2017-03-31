@@ -57,6 +57,7 @@ class GameWindow(kvy.KeyboardWidget, kvy.FloatLayout):
         world.player.melee_bonus = 1
         world.player.melee_damage = [1, 10]
         world.player.hp = 10
+        world.player.max_hp = 10
 
         self.view = view
         self.menu = menu
@@ -80,6 +81,7 @@ class GameWindow(kvy.KeyboardWidget, kvy.FloatLayout):
                 kwargs["melee_bonus"] = 0
                 kwargs["melee_damage"] = [1, 6]
                 kwargs["hp"] = 10
+                kwargs["max_hp"] = 10
             sprite = x, y, z, image
             self.world.set_cell(x, y, z, sprite=sprite, **kwargs)
         elif self.mode == constants.EDIT_MODE_PLAYER:
