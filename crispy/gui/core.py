@@ -52,6 +52,11 @@ class GameWindow(kvy.KeyboardWidget, kvy.FloatLayout):
         world.player.cell = 0, 0, 0
         world.player.sprite = 0, 0, 0, constants.IMG_PLAYER
         world.player.energy = 0
+        world.player.melee = 5
+        world.player.armor_class = 5
+        world.player.melee_bonus = 1
+        world.player.melee_damage = [1, 10]
+        world.player.hp = 10
 
         self.view = view
         self.menu = menu
@@ -59,20 +64,7 @@ class GameWindow(kvy.KeyboardWidget, kvy.FloatLayout):
 
     def on_input(self, user_input):
         vx, vy, vz = constants.DIRECTIONS[user_input]
-        focus = self.world.focus
-        x, y, z = focus.x + vx, focus.y + vy, focus.z + vz
-        try:
-            if (x, y, z) == focus.cell:
-                focus.energy -= 5
-            else:
-                focus.cell = x, y, z
-                focus.sprite = x, y, z, focus.sprite.image
-                try:
-                    focus.energy -= 5
-                except AttributeError:
-                    pass
-        except ValueError:
-            pass
+        self.world.move_cell(self.world.focus, vx, vy, vz)
 
     def on_tap(self, x, y, z, block):
         if self.mode in constants.EDIT_DRAW_MODES:
@@ -83,6 +75,11 @@ class GameWindow(kvy.KeyboardWidget, kvy.FloatLayout):
             elif self.mode == constants.EDIT_MODE_MONSTER:
                 image = constants.IMG_MONSTER
                 kwargs["energy"] = 0
+                kwargs["melee"] = 0
+                kwargs["armor_class"] = 0
+                kwargs["melee_bonus"] = 0
+                kwargs["melee_damage"] = [1, 6]
+                kwargs["hp"] = 10
             sprite = x, y, z, image
             self.world.set_cell(x, y, z, sprite=sprite, **kwargs)
         elif self.mode == constants.EDIT_MODE_PLAYER:

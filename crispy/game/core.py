@@ -1,5 +1,6 @@
 from .ecs import ProcessManager
 from .objects import GameObject
+from .corerules import Melee
 from utils import InvertibleDict
 from utils import ReversibleDict
 from utils import TupleDict
@@ -35,6 +36,11 @@ class World(ProcessManager):
         self["sprite"] = SpriteDict()
         self["energy"] = dict()
         self["behavior"] = dict()
+        self["melee"] = dict()
+        self["melee_bonus"] = dict()
+        self["melee_damage"] = dict()
+        self["armor_class"] = dict()
+        self["hp"] = dict()
         self.clear()
 
 
@@ -73,6 +79,33 @@ class World(ProcessManager):
         eid = self["cell"].inverse.get(pos, None)
         if eid is not None:
             return self.get_entity(eid)
+
+    def move_cell(self, entity, vx, vy=None, vz=None):
+        ex, ey, ez = entity.cell
+        x, y, z = ex + vx, ey + vy, ez + vz
+        try:
+            entity.cell = x, y, z
+            entity.sprite = x, y, z, entity.sprite[3]
+            try:
+                entity.energy -= 5
+            except AttributeError:
+                pass
+        except ValueError:
+            cell = self.get_cell(x, y, z)
+            if cell != entity:
+                result = Melee(attacker=entity, weapon=entity, target=cell)
+                print("Attack")
+                print("Rolled: {}".format(result.check.roll))
+                print("({0}/{1}/{2})".format(result.check._first, result.check._low, result.check._high))
+                print("Bonus:  {}".format(result.check.bonus))
+                print("Total:  {}".format(result.check.get_total()))
+                print("DC:     {}".format(result.check.dc))
+                print()
+                print("HP:  {0}/{1}".format(cell.hp, 10))
+                print()
+                print("Dice:   {}".format(result.dicepool.get_roll()))
+            else:
+                entity.energy -= 5
 
     def clear(self, entity=None):
         super().clear(entity)
