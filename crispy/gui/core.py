@@ -20,6 +20,7 @@ class GameApp(kvy.App):
         data += " Focus EID:        {}\n".format(self.world.focus.eid)
         if hasattr(self.world.player, "cell"):
             data += " Player Cell:   {}\n".format(self.world.player.cell)
+            data += " Player Energy: {}\n".format(self.world.player.energy)
         if hasattr(self.world.camera, "pos"):
             data += " Camera Position:  {}\n".format(self.world.camera.pos)
         return data
@@ -50,6 +51,7 @@ class GameWindow(kvy.KeyboardWidget, kvy.FloatLayout):
 
         world.player.cell = 0, 0, 0
         world.player.sprite = 0, 0, 0, constants.IMG_PLAYER
+        world.player.energy = 0
 
         self.view = view
         self.menu = menu
@@ -64,16 +66,22 @@ class GameWindow(kvy.KeyboardWidget, kvy.FloatLayout):
             focus.sprite = x, y, z, focus.sprite.image
         except ValueError:
             pass
+        try:
+            focus.energy -= 5
+        except AttributeError:
+            pass
 
     def on_tap(self, x, y, z, block):
         if self.mode in constants.EDIT_DRAW_MODES:
             image = constants.IMG_GRANITE
+            kwargs = dict()
             if self.mode == constants.EDIT_MODE_FLOOR:
                 z -= 1
             elif self.mode == constants.EDIT_MODE_MONSTER:
                 image = constants.IMG_MONSTER
+                kwargs["energy"] = 0
             sprite = x, y, z, image
-            self.world.set_cell(x, y, z, sprite=sprite)
+            self.world.set_cell(x, y, z, sprite=sprite, **kwargs)
         elif self.mode == constants.EDIT_MODE_PLAYER:
             self.world.player.cell = x, y, z
             sprite = x, y, z, constants.IMG_PLAYER

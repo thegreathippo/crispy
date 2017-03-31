@@ -55,7 +55,9 @@ class World(ProcessManager):
         self._focus = eid
 
     def spin(self, *args):
-        self()
+        if hasattr(self.focus, "energy"):
+            while self.focus.energy < 0:
+                self()
 
     def set_cell(self, x, y=None, z=None, **kwargs):
         pos = get_coor(x, y, z)
