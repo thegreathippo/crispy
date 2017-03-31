@@ -14,6 +14,26 @@ EID_TRANSLATION = {
     2: EID_CAMERA
 }
 
+INPUT_NORTH = object()
+INPUT_SOUTH = object()
+INPUT_EAST = object()
+INPUT_WEST = object()
+INPUT_NORTH_EAST = object()
+INPUT_NORTH_WEST = object()
+INPUT_SOUTH_EAST = object()
+INPUT_SOUTH_WEST = object()
+INPUT_NONE = object()
+
+DIRECTIONS = {
+    INPUT_NORTH: (0, 1, 0),
+    INPUT_SOUTH: (0, -1, 0),
+    INPUT_EAST: (1, 0, 0),
+    INPUT_WEST: (-1, 0, 0),
+    INPUT_NORTH_EAST: (1, 1, 0),
+    INPUT_NORTH_WEST: (-1, 1, 0),
+    INPUT_SOUTH_EAST: (1, -1, 0),
+    INPUT_SOUTH_WEST: (-1, -1, 0)
+}
 
 EDIT_MODE_ERASE = "edit erase mode"
 EDIT_MODE_FLOOR = "edit floor mode"

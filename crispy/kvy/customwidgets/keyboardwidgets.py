@@ -1,5 +1,6 @@
 from kivy.uix.widget import Widget
 from kivy.core.window import Window
+import constants
 
 
 class KeyboardWidget(Widget):
@@ -14,43 +15,46 @@ class KeyboardWidget(Widget):
             pass
         self._keyboard.bind(on_key_down=self._on_keyboard_down)
 
+    def on_input(self, user_input):
+        pass
+
     def _keyboard_closed(self):
         self._keyboard.unbind(on_key_down=self._on_keyboard_down)
         self._keyboard = None
 
     def _on_keyboard_down(self, keyboard, keycode, text, modifiers):
         if keycode[0] == 261:
-            print("center")
+            self.on_input(constants.INPUT_NONE)
         if keycode[0] == 264:
             # North
-            print("north")
+            self.on_input(constants.INPUT_NORTH)
         if keycode[0] == 258:
             # South
-            print("south")
+            self.on_input(constants.INPUT_SOUTH)
 
         if keycode[0] == 262:
             # East
-            print("east")
+            self.on_input(constants.INPUT_EAST)
 
         if keycode[0] == 260:
             # West
-            print("west")
+            self.on_input(constants.INPUT_WEST)
 
         if keycode[0] == 263:
             # North West
-            print("northwest")
+            self.on_input(constants.INPUT_NORTH_WEST)
 
         if keycode[0] == 265:
             # North East
-            print("northeast")
+            self.on_input(constants.INPUT_NORTH_EAST)
 
         if keycode[0] == 257:
             # South West
-            print("southwest")
+            self.on_input(constants.INPUT_SOUTH_WEST)
 
         if keycode[0] == 259:
             # South East
-            print('southeast')
+            self.on_input(constants.INPUT_SOUTH_EAST)
 
         return True
 

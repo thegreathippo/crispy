@@ -55,8 +55,15 @@ class GameWindow(kvy.KeyboardWidget, kvy.FloatLayout):
         self.menu = menu
         self.mode = None
 
-    def on_block_tap(self, block):
-        pass
+    def on_input(self, user_input):
+        vx, vy, vz = constants.DIRECTIONS[user_input]
+        player = self.world.player
+        x, y, z = player.x + vx, player.y + vy, player.z + vz
+        try:
+            player.cell = x, y, z
+            player.sprite = x, y, z, player.sprite.image
+        except ValueError:
+            pass
 
     def on_tap(self, x, y, z, block):
         if self.mode in constants.EDIT_DRAW_MODES:
