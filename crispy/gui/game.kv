@@ -16,7 +16,7 @@
 
 <GameWindow>:
 
-    ViewScreen:
+    View:
         id: view_screen
 
     Label:
@@ -30,25 +30,22 @@
         id: menu
         EditButton:
             text: "Erase"
-            on_press: root.mode = const.MODE_ERASE
+            on_press: root.mode = const.EDIT_MODE_ERASE
         EditButton:
             text: "Wall"
-            on_press: root.mode = const.MODE_DRAW_WALL
+            on_press: root.mode = const.EDIT_MODE_WALL
         EditButton:
             text: "Floor"
-            on_press: root.mode = const.MODE_DRAW_FLOOR
-        EditButton:
-            text: "Roof"
-            on_press: root.mode = const.MODE_DRAW_ROOF
+            on_press: root.mode = const.EDIT_MODE_FLOOR
         EditButton:
             text: "Monster"
-            on_press: root.mode = const.MODE_DRAW_MONSTER
+            on_press: root.mode = const.EDIT_MODE_MONSTER
         EditButton:
             text: "Player"
-            on_press: root.mode = const.MODE_DRAW_PLAYER
+            on_press: root.mode = const.EDIT_MODE_PLAYER
         EditButton:
             text: "Select"
-            on_press: root.mode = const.MODE_CHANGE_FOCUS
+            on_press: root.mode = const.EDIT_MODE_SELECT
         EditButton:
             text: "Root-Data"
             on_press: print(root.world)

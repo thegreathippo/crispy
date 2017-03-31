@@ -1,3 +1,9 @@
+TILE_SIZE = 16
+SPRITE_SIZE = TILE_SIZE, TILE_SIZE + (TILE_SIZE // 2)
+
+DEFAULT_SAVE_PATH = "game.pkl"
+
+
 EID_NULL = 0
 EID_PLAYER = 1
 EID_CAMERA = 2
@@ -8,18 +14,13 @@ EID_TRANSLATION = {
     2: EID_CAMERA
 }
 
-EID_START_COUNT = len(EID_TRANSLATION) + 1
 
-
-MODE_ERASE = "erase mode"
-MODE_DRAW_FLOOR = "draw floor mode"
-MODE_DRAW_WALL = "draw wall mode"
-MODE_DRAW_PLAYER = "draw player mode"
-MODE_DRAW_MONSTER = "draw monster mode"
-MODE_DRAW_ROOF = "draw roof mode"
-MODE_CHANGE_FOCUS = "change focus mode"
-
-MAX_SPINS = 100
+EDIT_MODE_ERASE = "edit erase mode"
+EDIT_MODE_FLOOR = "edit floor mode"
+EDIT_MODE_WALL = "edit wall mode"
+EDIT_MODE_PLAYER = "edit player mode"
+EDIT_MODE_MONSTER = "edit monster mode"
+EDIT_MODE_SELECT = "select focus mode"
 
 IMG_GRANITE = "img_granite"
 IMG_PLAYER = "img_player"

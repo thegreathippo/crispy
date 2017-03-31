@@ -1,63 +1,58 @@
-from utils import InternalDict
+"""Contains the BaseEntity class; this is the base class for
+all entity objects.
+"""
 
 
 class BaseEntity:
     def __init__(self, *args, **kwargs):
-        root = args[0]
-        try:
-            eid = args[1]
-        except IndexError:
-            eid = root.eid_count
-            root.eid_count += 1
+        """Initialize the BaseEntity class instance.
+
+        ARGUMENTS:
+          args: A 2-value tuple containing an instance of the ComponentManager
+            class (or any class that inherits from it) and an eid (an integer
+            representing this entity's identity).
+          kwargs: Keyword arguments that will be assigned as attributes
+            (components) to this entity.
+
+        EXCEPTIONS:
+          ValueError: Raised if *args is not a 2D sequence.
+        """
+        # TODO:
+        #   * Error-check root? Ensure it has correct methods?
+        root, eid = args
         self.__dict__["root"] = root
         self.eid = eid
         for key in kwargs:
             setattr(self, key, kwargs[key])
 
     def clear(self):
+        """Clear all components from this entity."""
         self.root.clear(self)
 
     def __getattr__(self, attr):
         try:
-            value = self.root[attr][self.eid]
+            return self.root.get_entity_component(self, attr)
         except KeyError:
             return super().__getattribute__(attr)
-        return value
 
     def __setattr__(self, attr, value):
         if attr not in self.root:
             super().__setattr__(attr, value)
         else:
-            self.root[attr][self.eid] = value
+            self.root.set_entity_component(self, attr, value)
 
     def __delattr__(self, attr):
         try:
             super().__delattr__(attr)
         except AttributeError:
-            del self.root[attr][self.eid]
+            self.root.del_entity_component(self, attr)
 
     def __eq__(self, other):
         try:
-            return (other.eid, other.root.rid) == (self.eid, self.root.rid)
+            return (other.eid, other.root.r_id) == (self.eid, self.root.r_id)
         except AttributeError:
             return False
 
     def __hash__(self):
-        return hash((self.eid, self.root.rid))
+        return hash((self.eid, self.root.r_id))
 
-
-class Root(InternalDict):
-    rid = 0
-    entity_cls = BaseEntity
-
-    def __init__(self):
-        super().__init__()
-        self.rid = self.rid
-        type(self).rid += 1
-        self.eid_count = 0
-
-    def get_entity(self, eid=None, **kwargs):
-        if eid is None:
-            return self.entity_cls(self, **kwargs)
-        else:
-            return self.entity_cls(self, eid, **kwargs)

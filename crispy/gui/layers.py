@@ -1,125 +1,108 @@
-from kivy.uix.floatlayout import FloatLayout
-from kivy.uix.scatterlayout import ScatterLayout
-from kivy.uix.image import Image
-from kivy.graphics.transformation import Matrix
+import kvy
 import utils
-import config
 import constants
 
+Z_TOP = 10
+Z_BOTTOM = -10
 
-class ViewScreen(ScatterLayout):
+
+class View(kvy.ScatterLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.layers = []
-        for i in range(-1, 2):
-            layer = SpriteLayer(i)
-            self.layers.append(layer)
-            self.add_widget(layer)
-        self.eids = dict()
-        self.camera = utils.Point3(0, 0, 0)
-
-    def load_sprite(self, entity):
-        layer = self.layers[entity.sprite.z]
-        layer.add_sprite(entity)
-        self.eids[entity.eid] = layer
-
-    def remove_sprite(self, eid):
-        layer = self.eids[eid]
-        layer.remove_sprite(eid)
-        del self.eids[eid]
-
-    def move_sprite(self, eid, old_pos, new_pos):
-        layer = self.eids[eid]
-        layer.move_sprite(eid, old_pos, new_pos)
-
-    def follow_camera(self, camera):
-        x, y = utils.get_centered_camera(camera.x, camera.y)
-        sx, sy = utils.transform_to_screen(x, y)
-        z, sz = camera.z, camera.z
-        if (sx, sy, sz) != self.camera:
-            dx = self.camera.x - sx
-            dy = self.camera.y - sy
-            dz = self.camera.z - sz
-            self.adjust_camera(dx, dy, dz)
-            self.camera = utils.Point3(sx, sy, sz)
-
-    def adjust_camera(self, dx, dy, dz):
-        mat = Matrix().translate(dx, dy, 0)
-        self.apply_transform(mat)
-        if dz:
-            pass
-
-
-class LayerManager:
-
-    def __init__(self, widget):
-        self.add_widget = widget.add_widget
-        self.remove_widget = widget.remove_widget
-        self.children = widget.children
         self.layers = dict()
+        for z in range(Z_BOTTOM, Z_TOP + 1):
+            layer = SpriteLayer(z)
+            self.layers[z] = layer
+        self.screen_camera = utils.Point3(0, 0, 0)
+        self.eid_to_layer = dict()
+        self.eid_to_sprite = dict()
+        self.add_widget(self.layers[-1])
+        self.add_widget(self.layers[0])
+        self.add_widget(self.layers[1])
 
-    def add(self, widget, layer):
-        self.layers[widget] = layer
-        if len(self.children) == 0:
-            self.add_widget(widget)
-            return
+    def load_sprite(self, entity, sprite_data):
+        eid = entity.eid
+        layer = self.layers[sprite_data.z]
+        sprite = layer.add_sprite(sprite_data)
+        self.eid_to_layer[eid] = layer
+        self.eid_to_sprite[eid] = sprite
+
+    def unload_sprite(self, entity):
+        eid = entity.eid
+        layer = self.eid_to_layer[eid]
+        sprite = self.eid_to_sprite[eid]
+        layer.remove_sprite(sprite)
+        del self.eid_to_layer[eid]
+        del self.eid_to_sprite[eid]
+
+    def change_sprite(self, entity, old_data, new_data):
+        eid = entity.eid
+        if old_data.z != new_data.z:
+            self.remove_sprite(entity)
+            self.load_sprite(entity, new_data)
         else:
-            for i, element in enumerate(list(self.children)):
-                if self.layers[element] > layer:
-                    self.add_widget(widget, i)
-                    return
-        self.add_widget(widget, len(self.children))
-
-    def move(self, widget, layer):
-        self.remove_widget(widget)
-        self.add(widget, layer)
-
-    def remove(self, widget):
-        self.remove_widget(widget)
-        del self.layers[widget]
+            layer = self.eid_to_layer[eid]
+            sprite = self.eid_to_sprite[eid]
+            vx, vy = new_data.x - old_data.x, new_data.y - old_data.y
+            layer.move_sprite(sprite, vx, vy)
 
 
-class SpriteLayer(FloatLayout):
+class SpriteLayer(kvy.FloatLayout):
 
     def __init__(self, z, **kwargs):
         super().__init__(**kwargs)
         self.z = z
-        self.eids = dict()
-        self.layers = LayerManager(self)
+        self.depth = dict()
 
-    def add_sprite(self, entity):
-        sprite = Sprite(entity, self.z)
-        self.layers.add(sprite, entity.y)
-        self.eids[entity.eid] = sprite
+    def add_widget(self, widget, depth=0):
+        self.depth[widget] = depth
+        if len(self.children) == 0:
+            return super().add_widget(widget)
+        else:
+            for i, element in enumerate(list(self.children)):
+                if self.depth[element] > depth:
+                    return super().add_widget(widget, i)
+        super().add_widget(widget, len(self.children))
 
-    def remove_sprite(self, eid):
-        sprite = self.eids[eid]
-        self.layers.remove(sprite)
+    def remove_widget(self, widget):
+        del self.depth[widget]
+        super().remove_widget(widget)
 
-    def move_sprite(self, eid, old_pos, new_pos):
-        sprite = self.eids[eid]
-        vx, vy = new_pos.x - old_pos.x, new_pos.y - old_pos.y
+    def clear_widgets(self, children=None):
+        if children:
+            for child in children:
+                del self.depth[child]
+        else:
+            self.depth.clear()
+        super().clear_widgets(children)
+
+    def add_sprite(self, sprite_data):
+        sprite = Sprite(sprite_data)
+        self.add_widget(sprite, sprite.cell_y)
+        return sprite
+
+    def remove_sprite(self, sprite):
+        self.remove_widget(sprite)
+
+    def move_sprite(self, sprite, vx, vy):
         sprite.move(vx, vy)
-        self.layers.move(sprite, new_pos.y)
+        if vy:
+            self.remove_widget(sprite)
+            self.add_widget(sprite, sprite.cell_y)
 
 
-class Sprite(Image):
-    def __init__(self, entity, layer):
+class Sprite(kvy.Image):
+    def __init__(self, sprite_data):
         super().__init__()
-        data = entity.sprite
-        sx, sy = utils.transform_to_screen(data.x, data.y)
-        self.cell_x = data.x
-        self.cell_y = data.y
-        self.cell_z = data.z
-        self.allow_stretch = True
-        self.size = config.SPRITE_SIZE
-        self.size_hint = None, None
+        cx, cy, cz, img = sprite_data
+        self.cell_x, self.cell_y, self.cell_z = cx, cy, cz
+        sx, sy = kvy.transform_grid_to_touch(cx, cy)
         self.x = sx
-        self.y = sy + (layer * (int(config.TILE_SIZE // 2)))
-        self.source = constants.IMG_PATHS[entity.sprite.image][layer]
+        self.y = sy + (cz * (int(constants.TILE_SIZE // 2)))
+        self.source = constants.IMG_PATHS[img][cz]
 
     def move(self, vx, vy):
-        svx, svy = utils.transform_to_screen(vx, vy)
+        svx, svy = kvy.transform_grid_to_touch(vx, vy)
         self.x += svx
         self.y += svy
         self.cell_x += vx

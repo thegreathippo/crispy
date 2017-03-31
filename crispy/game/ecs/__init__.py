@@ -1,1 +1,1 @@
-from .core import System
+from .processes import ProcessManager

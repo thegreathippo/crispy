@@ -1,21 +1,30 @@
-import pickle
-from .ecs import System
+from .ecs import ProcessManager
 from .objects import GameObject
-from utils import CellDict
-from utils import PosDict
-from utils import SpriteDict
-import config
+from utils import InvertibleDict
+from utils import ReversibleDict
+from utils import TupleDict
+from utils import Point3
+from utils import Sprite3
 import constants
-import random
 
 
-class World(System):
+class CellDict(TupleDict, InvertibleDict):
+    cls = Point3
+
+
+class PosDict(TupleDict, ReversibleDict):
+    cls = Point3
+
+
+class SpriteDict(TupleDict):
+    cls = Sprite3
+
+
+class World(ProcessManager):
 
     def __init__(self):
         super().__init__()
-        self.eid_count = constants.EID_START_COUNT
         self._focus = constants.EID_PLAYER
-        self._turn = constants.EID_PLAYER
 
         class Entity(self.entity_cls, GameObject):
             pass
@@ -24,18 +33,8 @@ class World(System):
         self["cell"] = CellDict()
         self["pos"] = PosDict()
         self["sprite"] = SpriteDict()
-        self["material"] = dict()
-        self["initiative"] = dict()
-        self.setup()
+        self.clear()
 
-    def setup(self):
-        self.player.initiative = 0
-        self.focus = self.player
-        self.camera.pos = 0, 0, 0
-
-    @property
-    def null(self):
-        return self.get_entity(constants.EID_NULL)
 
     @property
     def player(self):
@@ -54,26 +53,8 @@ class World(System):
         eid = get_eid(entity_or_eid)
         self._focus = eid
 
-    @property
-    def turn(self):
-        return self.get_entity(self._turn)
-
-    @turn.setter
-    def turn(self, entity_or_eid):
-        eid = get_eid(entity_or_eid)
-        self._turn = eid
-
     def spin(self, *args):
-        total_spins = 0
-        if self.turn != self.null:
-            if self.turn.initiative < 0:
-                self.turn = constants.EID_NULL
-        while self.turn != self.focus:
-            self()
-            total_spins += 1
-            if total_spins > 100:
-                raise RuntimeError("Maximum spins exceeded ({})".format(total_spins))
-                break
+        self()
 
     def set_block(self, x, y=None, z=None, **kwargs):
         pos = get_coor(x, y, z)
@@ -94,56 +75,20 @@ class World(System):
         # elsewhere
         vx, vy, vz = get_coor(vx, vy, vz)
         try:
-            x, y, z = block.cell.x + vx, block.cell.y + vy, block.cell.z + vz
+            x, y, z = block.cell[0] + vx, block.cell[1] + vy, block.cell[2] + vz
             block.cell = x, y, z
-            block.sprite = x, y, z, block.sprite.image
+            try:
+                block.sprite = x, y, z, block.sprite[3]
+            except AttributeError:
+                pass
         except ValueError:
             return False
-        if hasattr(block, "initiative"):
-            block.initiative -= 5
         return True
 
-    def save(self, path=None):
-        if not path:
-            path = config.DEFAULT_SAVE_PATH
-        save_dict = dict()
-        for c in self:
-            save_dict[c] = dict(self[c])
-        with open(path, "wb") as f:
-            pickle.dump(save_dict, f, pickle.HIGHEST_PROTOCOL)
-
-    def load(self, path=None):
-        # note: The purpose of eid_translation is to 'clear out' unused eids (which occur when we clear eids).
-        # however, the first few EIDs are reserved for special objects, hence why the translator starts with
-        # a special dictionary (EID_TRANSLATION)
-        if not path:
-            path = config.DEFAULT_SAVE_PATH
-        self.clear()
-        eid_translation = dict(constants.EID_TRANSLATION)
-        eid_count = constants.EID_START_COUNT
-        with open(path, "rb") as f:
-            data = pickle.load(f)
-            for component in self:
-                for eid in data[component]:
-                    if eid not in eid_translation:
-                        eid_translation[eid] = eid_count
-                        eid_count += 1
-                    translated_eid = eid_translation[eid]
-                    self[component][translated_eid] = data[component][eid]
-        self.eid_count = eid_count
-
     def clear(self, entity=None):
-        if entity is not None:
-            for component in self:
-                try:
-                    del self[component][entity.eid]
-                except KeyError:
-                    continue
-        else:
-            for component in self:
-                self[component].clear()
-            self.eid_count = constants.EID_START_COUNT
-            self.setup()
+        super().clear(entity)
+        self.camera.pos = 0, 0, 0
+        self.focus = self.player
 
 
 def get_coor(x, y=None, z=None):
