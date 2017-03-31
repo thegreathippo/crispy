@@ -62,13 +62,16 @@ class GameWindow(kvy.KeyboardWidget, kvy.FloatLayout):
         focus = self.world.focus
         x, y, z = focus.x + vx, focus.y + vy, focus.z + vz
         try:
-            focus.cell = x, y, z
-            focus.sprite = x, y, z, focus.sprite.image
+            if (x, y, z) == focus.cell:
+                focus.energy -= 5
+            else:
+                focus.cell = x, y, z
+                focus.sprite = x, y, z, focus.sprite.image
+                try:
+                    focus.energy -= 5
+                except AttributeError:
+                    pass
         except ValueError:
-            pass
-        try:
-            focus.energy -= 5
-        except AttributeError:
             pass
 
     def on_tap(self, x, y, z, block):

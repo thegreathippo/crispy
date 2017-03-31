@@ -34,6 +34,7 @@ class World(ProcessManager):
         self["pos"] = PosDict()
         self["sprite"] = SpriteDict()
         self["energy"] = dict()
+        self["behavior"] = dict()
         self.clear()
 
 
