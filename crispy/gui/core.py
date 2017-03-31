@@ -48,7 +48,7 @@ class GameWindow(kvy.KeyboardWidget, kvy.FloatLayout):
         world.bind_del("sprite", view.unload_sprite, send_eid=False)
         world.bind_change("sprite", view.change_sprite, send_eid=False)
 
-        world.player.cell = 0, 0, 1
+        world.player.cell = 0, 0, 0
         world.player.sprite = 0, 0, 0, constants.IMG_PLAYER
 
         self.view = view
@@ -58,9 +58,21 @@ class GameWindow(kvy.KeyboardWidget, kvy.FloatLayout):
     def on_block_tap(self, block):
         pass
 
-    def on_tap(self, x, y, z):
-        sprite = x, y, z, constants.IMG_GRANITE
-        self.world.set_block(x, y, z, sprite=sprite)
+    def on_tap(self, x, y, z, block):
+        if self.mode in constants.EDIT_DRAW_MODES:
+            image = constants.IMG_GRANITE
+            if self.mode == constants.EDIT_MODE_FLOOR:
+                z -= 1
+            elif self.mode == constants.EDIT_MODE_MONSTER:
+                image = constants.IMG_MONSTER
+            sprite = x, y, z, image
+            self.world.set_block(x, y, z, sprite=sprite)
+        elif self.mode == constants.EDIT_MODE_PLAYER:
+            self.world.player.cell = x, y, z
+            sprite = x, y, z, constants.IMG_PLAYER
+            self.world.player.sprite = sprite
+        elif self.mode == constants.EDIT_MODE_ERASE and block:
+            block.clear()
 
     def on_touch_down(self, touch):
         if self.menu.collide_point(*touch.pos):
@@ -71,7 +83,4 @@ class GameWindow(kvy.KeyboardWidget, kvy.FloatLayout):
             block = self.world.get_block(x, y, z)
             if not block:
                 block = self.world.get_block(x, y, z - 1)
-            if block:
-                self.on_block_tap(block)
-            else:
-                self.on_tap(x, y, z)
+            self.on_tap(x, y, z, block)

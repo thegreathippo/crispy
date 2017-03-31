@@ -22,6 +22,8 @@ EDIT_MODE_PLAYER = "edit player mode"
 EDIT_MODE_MONSTER = "edit monster mode"
 EDIT_MODE_SELECT = "select focus mode"
 
+EDIT_DRAW_MODES = [EDIT_MODE_FLOOR, EDIT_MODE_WALL, EDIT_MODE_MONSTER]
+
 IMG_GRANITE = "img_granite"
 IMG_PLAYER = "img_player"
 IMG_MONSTER = "img_monster"
