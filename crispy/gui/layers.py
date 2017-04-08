@@ -1,5 +1,4 @@
 import kvy
-import utils
 import constants
 
 Z_TOP = 10
@@ -13,7 +12,7 @@ class View(kvy.ScatterLayout):
         for z in range(Z_BOTTOM, Z_TOP + 1):
             layer = SpriteLayer(z)
             self.layers[z] = layer
-        self.screen_camera = utils.Point3(0, 0, 0)
+        self.screen_camera = (0, 0, 0)
         self.eid_to_layer = dict()
         self.eid_to_sprite = dict()
         self.add_widget(self.layers[-1])
