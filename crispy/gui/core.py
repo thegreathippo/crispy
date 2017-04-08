@@ -1,4 +1,3 @@
-import utils
 import constants
 import kvy
 import gui.layers
@@ -13,14 +12,10 @@ class GameApp(kvy.App):
     def get_debug_data(self):
         data = ""
         data += " # of Components:  {}\n".format(len(self.world))
-        data += " EID Counter:      {}\n".format(self.world.eid_count)
         data += " # of Cell EIDs:   {}\n".format(len(self.world["cell"]))
         data += " # of Sprite EIDs: {}\n".format(len(self.world["sprite"]))
         data += " Player EID:       {}\n".format(self.world.player.eid)
         data += " Focus EID:        {}\n".format(self.world.focus.eid)
-        if hasattr(self.world.player, "cell"):
-            data += " Player Cell:   {}\n".format(self.world.player.cell)
-            data += " Player Energy: {}\n".format(self.world.player.energy)
         if hasattr(self.world.camera, "pos"):
             data += " Camera Position:  {}\n".format(self.world.camera.pos)
         return data
@@ -45,9 +40,9 @@ class GameWindow(kvy.KeyboardWidget, kvy.FloatLayout):
         view = self.ids["view_screen"]
         menu = self.ids["menu"]
 
-        world.bind_new("sprite", view.load_sprite, send_eid=False)
-        world.bind_del("sprite", view.unload_sprite, send_eid=False)
-        world.bind_change("sprite", view.change_sprite, send_eid=False)
+        world["sprite"].bind_new(view.load_sprite)
+        world["sprite"].bind_del(view.unload_sprite)
+        world["sprite"].bind_change(view.change_sprite)
 
         world.player.cell = 0, 0, 0
         world.player.sprite = 0, 0, 0, constants.IMG_PLAYER
