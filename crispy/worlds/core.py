@@ -33,10 +33,17 @@ class World(ProcessManager):
 
         self.Entity = WorldEntity
         self._focus = constants.EID_PLAYER
+        self["name"] = dict()
         self["cell"] = Cell3Dict()
         self["pos"] = Pos3Dict()
         self["sprite"] = Sprite3Dict(self)
         self["energy"] = dict()
+        self["melee"] = dict()
+        self["armor_class"] = dict()
+        self["melee_bonus"] = dict()
+        self["melee_damage"] = dict()
+        self["max_hp"] = dict()
+        self["damage"] = dict()
         self.clear()
 
     @property
@@ -57,10 +64,41 @@ class World(ProcessManager):
         self._focus = eid
 
     def spin(self, *args):
-        self()
-#        if hasattr(self.focus, "energy"):
-#            while self.focus.energy < 0:
-#                self()
+        if hasattr(self.focus, "energy"):
+            while self.focus.energy < 0:
+                self()
+
+    def set_player(self, x, y=None, z=None, **kwargs):
+        pos = get_coor(x, y, z)
+        cell = self.get_cell(x, y, z)
+        if cell:
+            return
+        kwargs["name"] = "Player"
+        kwargs["cell"] = pos
+        kwargs["sprite"] = x, y, z, constants.IMG_PLAYER
+        kwargs["energy"] = 0
+        kwargs["melee"] = 5
+        kwargs["armor_class"] = 0
+        kwargs["damage"] = 0
+        kwargs["max_hp"] = 10
+        for k in kwargs:
+            setattr(self.player, k, kwargs[k])
+
+    def set_agent(self, x, y=None, z=None, **kwargs):
+        pos = get_coor(x, y, z)
+        cell = self.get_cell(x, y, z)
+        if cell:
+            return
+        kwargs["name"] = "Monster"
+        kwargs["sprite"] = x, y, z, constants.IMG_MONSTER
+        kwargs["energy"] = 0
+        kwargs["melee"] = 5
+        kwargs["armor_class"] = 0
+        kwargs["damage"] = 0
+        kwargs["max_hp"] = 10
+        kwargs["cell"] = pos
+        e = self.Entity(**kwargs)
+        return e
 
     def set_cell(self, x, y=None, z=None, **kwargs):
         pos = get_coor(x, y, z)
@@ -75,15 +113,6 @@ class World(ProcessManager):
         eid = self["cell"].inverse.get(pos, None)
         if eid is not None:
             return self.Entity(eid)
-
-    def move_cell(self, entity, vx, vy=None, vz=None):
-        ex, ey, ez = entity.cell
-        x, y, z = ex + vx, ey + vy, ez + vz
-        try:
-            entity.cell = x, y, z
-            entity.sprite = x, y, z, entity.sprite[3]
-        except ValueError:
-            pass
 
     def clear(self, entity=None):
         super().clear(entity)

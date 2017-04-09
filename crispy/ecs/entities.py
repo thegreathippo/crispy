@@ -33,6 +33,7 @@ class BaseEntity:
 
     def __setattr__(self, attr, value):
         if attr not in self.root:
+            # Raise warning?
             super().__setattr__(attr, value)
         else:
             self.root.set_entity_component(self, attr, value)

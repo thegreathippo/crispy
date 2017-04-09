@@ -71,7 +71,7 @@ class InvertibleDict(CustomDict):
         return self[key]
 
     def __setitem__(self, item, value):
-        if value in self.inverse:
+        if value in self.inverse and self.inverse[value] != item:
             item_val = self.get(item, NULL)
             raise CollisionError(item, item_val, self.inverse[value], value)
         if item in self:

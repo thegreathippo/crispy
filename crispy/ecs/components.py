@@ -91,4 +91,3 @@ class ComponentManager(collections.OrderedDict):
             return self.identity == other.identity
         except AttributeError:
             return False
-
