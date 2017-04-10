@@ -33,11 +33,16 @@ class ClearEntity:
         for eid in ClearEntity.eids:
             entity = world.Entity(eid)
             world.clear(entity)
+        ClearEntity.eids.clear()
+
+
+def clear_entity(entity):
+    world.clear(entity)
 
 
 world.register_process(gain_energy, domain="energy")
 world.register_process(take_action, domain="energy")
-world.register_process(ClearEntity.run, domain="dead", teardown=ClearEntity.clear)
+world.register_process(clear_entity, domain="dead")
 
 app.run()
 

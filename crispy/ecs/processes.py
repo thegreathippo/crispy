@@ -57,7 +57,7 @@ class ProcessManager(ComponentManager):
         for process in self._queue:
             if process.setup:
                 process.setup()
-            for eid in process.domain_view:
+            for eid in list(process.domain_view):
                 process.func(self.Entity(eid))
             if process.teardown:
                 process.teardown()
