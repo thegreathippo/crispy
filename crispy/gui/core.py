@@ -1,24 +1,17 @@
 import constants
 import kvy
 import actions
-import worlds
+import game
 import gui.layers
 
 
 class GameApp(kvy.App):
-    world = worlds.world
-    console_text = kvy.StringProperty(" \n Initializing...\n ")
+    world = game.world
 
     def build(self):
         window = GameWindow()
         kvy.schedule_interval(self.world.spin)
         return window
-
-    def add_to_console(self, text):
-        try:
-            self.console_text += "\n" + text
-        except TypeError:
-            self.console_text += "\n" + str(text)
 
 
 class GameWindow(kvy.KeyboardWidget, kvy.FloatLayout):
@@ -27,6 +20,7 @@ class GameWindow(kvy.KeyboardWidget, kvy.FloatLayout):
         super().__init__(**kwargs)
         view = self.ids["view_screen"]
         menu = self.ids["menu"]
+        console = self.ids["console"]
 
         app.world["sprite"].bind_new(view.load_sprite)
         app.world["sprite"].bind_del(view.unload_sprite)
@@ -36,18 +30,17 @@ class GameWindow(kvy.KeyboardWidget, kvy.FloatLayout):
 
         self.view = view
         self.menu = menu
+        self.console = console
         self.mode = None
+
+        kvy.schedule_interval(self.update_console)
+
+    def update_console(self, *args):
+        self.console.text = app.world.console.get()
 
     def on_input(self, user_input):
         direction = constants.DIRECTIONS[user_input]
-        try:
-            actions.movement.steps[direction](app.world.focus)
-        except ValueError as e:
-            entity = app.world.Entity(e.blocking_key)
-            if hasattr(entity, "damage"):
-                sword = app.world.Entity(melee_bonus=2, melee_damage=["slashing", 1, 6])
-                melee = actions.attacks.Melee(app.world.focus, sword, entity)
-                app.add_to_console(melee.check)
+        actions.movement.steps[direction](app.world.focus)
 
     def on_tap(self, x, y, z, block):
         if self.mode in constants.EDIT_DRAW_MODES:

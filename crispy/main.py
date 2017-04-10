@@ -1,10 +1,10 @@
 import random
-import worlds
+import game
 import actions
 import constants
 import gui
 
-world = worlds.world
+world = game.world
 app = gui.app
 
 
@@ -20,13 +20,7 @@ sword = world.Entity(melee_bonus=1, melee_damage=["slashing", 1, 6])
 def take_action(entity):
     if entity.energy >= 0 and entity != world.focus:
         direction = random.choice(directions)
-        try:
-            actions.movement.steps[direction](entity)
-        except ValueError as e:
-            target = world.Entity(e.blocking_key)
-            if hasattr(target, "damage"):
-                melee = actions.attacks.Melee(entity, sword, target)
-                app.add_to_console(melee.check)
+        actions.movement.steps[direction](entity)
 
 world.register_process(gain_energy, domain="energy")
 world.register_process(take_action, domain="energy")

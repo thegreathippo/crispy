@@ -151,7 +151,7 @@ class DicePool:
         self[dice_type].remove_die(dieroll)
 
     def get(self):
-        result = dict()
+        result = _DicePoolDict()
         for dice_type in self:
             if self.vantage:
                 result[dice_type] = self[dice_type].get(self.vantage)
@@ -183,6 +183,14 @@ class DicePool:
 
     def __repr__(self):
         return "{0}{1}".format(type(self).__name__, self._dice)
+
+
+class _DicePoolDict(dict):
+    def total(self):
+        result = 0
+        for val in self.values():
+            result += val
+        return result
 
 
 Die = namedtuple("Die", ["number", "face", "bonus"])

@@ -5,6 +5,7 @@ from ecs import ReversibleDict
 from ecs import CallbackDict
 from .utils import Point3
 from .utils import Sprite3
+from .consoles import Console
 import constants
 
 
@@ -27,8 +28,9 @@ class World(ProcessManager):
 
     def __init__(self):
         super().__init__()
+        self.console = Console("Initializing...")
 
-        class WorldEntity(self.Entity, WorldObject):
+        class WorldEntity(WorldObject, self.Entity):
             pass
 
         self.Entity = WorldEntity
@@ -67,6 +69,12 @@ class World(ProcessManager):
         if hasattr(self.focus, "energy"):
             while self.focus.energy < 0:
                 self()
+
+    def print_to_console(self, text):
+        try:
+            self.console_text += "\n" + text
+        except TypeError:
+            self.console_text += "\n" + str(text)
 
     def set_player(self, x, y=None, z=None, **kwargs):
         pos = get_coor(x, y, z)
@@ -116,6 +124,7 @@ class World(ProcessManager):
 
     def clear(self, entity=None):
         super().clear(entity)
+        self.set_player(0, 0, 0)
         self.camera.pos = 0, 0, 0
         self.focus = self.player
 

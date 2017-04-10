@@ -1,14 +1,6 @@
 from . import core
 
 
-def move(entity, direction):
-    x, y, z = entity.cell
-    vx, vy, vz = direction
-    pos = x + vx, y + vy, z + vz
-    entity.cell = pos
-    entity.sprite = pos[0], pos[1], pos[2], entity.sprite[3]
-
-
 @core.abstract
 class Move(core.Action):
     subjects = ["agent"]
@@ -20,16 +12,6 @@ class Step(Move):
     subjects = ["agent"]
     direction = (0, 0, 0)
     cost = 5
-
-    def before(self):
-        self.direction = self.direction
-
-    def after(self):
-        try:
-            move(self.subjects[0], self.direction)
-        except ValueError as e:
-            self.cost = 0
-            raise e
 
 
 class NoStep(Step):

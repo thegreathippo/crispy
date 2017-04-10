@@ -22,6 +22,8 @@ class CollisionError(ValueError):
 
 
 class InvertibleDict(CustomDict):
+    CollisionError = CollisionError
+
     def __init__(self, other=None, *args):
         super().__init__()
         self.inverse = dict()
