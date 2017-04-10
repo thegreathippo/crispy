@@ -11,6 +11,7 @@ class ActionBinding:
         actions.attacks.AttackMiss.bind_after(self.on_attack_miss)
         actions.attacks.AttackCritical.bind_after(self.on_attack_critical)
         actions.attacks.AttackFumble.bind_after(self.on_attack_fumble)
+        actions.damages.TakeDamage.bind_after(self.on_take_damage)
 
     @staticmethod
     def on_step(step):
@@ -37,8 +38,7 @@ class ActionBinding:
     @staticmethod
     def on_attack_hit(hit):
         attacker, weapon, target = hit.subjects
-        damage = hit.damage.get()
-        text = "{0} hit {1} for {2} damage!".format(attacker.name, target.name, damage.total())
+        text = "{0} hit {1}!".format(attacker.name, target.name)
         world.console.add(text)
 
     @staticmethod
@@ -57,4 +57,10 @@ class ActionBinding:
     def on_attack_fumble(fumble):
         attacker, weapon, target = fumble.subjects
         text = "{0} fumbled!".format(attacker.name)
+        world.console.add(text)
+
+    @staticmethod
+    def on_take_damage(damage):
+        target = damage.subjects[0]
+        text = "{0} took {1} damage!".format(target.name, damage.damage.get())
         world.console.add(text)

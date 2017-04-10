@@ -65,16 +65,16 @@ class ActionType(type):
 @abstract
 class Action(metaclass=ActionType):
     subjects = ["agent"]
-    check = None
-    damage = None
+    check_type = None
+    damage_type = None
     cost = 0
 
     def __init__(self, *args, **kwargs):
         self.subjects = _subjects[type(self)](*args, **kwargs)
-        if self.check:
-            self.check = self.check(self.subjects)
-        if self.damage:
-            self.damage = self.damage(self.subjects)
+        if self.check_type:
+            self.check = self.check_type(self.subjects)
+        if self.damage_type:
+            self.damage = self.damage_type(self.subjects)
 
     def after(self):
         pass

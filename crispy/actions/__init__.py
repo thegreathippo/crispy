@@ -13,3 +13,4 @@ TODO:
 """
 from . import movement
 from . import attacks
+from . import damages

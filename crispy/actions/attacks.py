@@ -1,4 +1,5 @@
 from . import core
+from .damages import TakeDamage
 from .checkrolls import CheckType
 from .damagerolls import DamageType
 
@@ -7,6 +8,13 @@ from .damagerolls import DamageType
 class AttackHit(core.Action):
     damage = None
     subjects = ["attacker", "weapon", "target"]
+
+    def __init__(self, damage, *args, **kwargs):
+        self.damage = damage
+        super().__init__(*args, **kwargs)
+
+    def after(self):
+        TakeDamage(self.damage, self.subjects.target)
 
 
 @core.abstract
@@ -31,11 +39,12 @@ class Attack(core.Action):
 
 
 class Melee(Attack):
-    check = CheckType(["attacker.melee", "weapon.melee_bonus"],
+    check_type = CheckType(["attacker.melee", "weapon.melee_bonus"],
                       ["target.armor_class"])
+    damage_type = DamageType(["weapon.melee_damage"])
 
     class MeleeHit(AttackHit):
-        damage = DamageType(["weapon.melee_damage"])
+        pass
 
     class MeleeCrit(MeleeHit, AttackCritical):
         pass
@@ -48,9 +57,9 @@ class Melee(Attack):
 
     def after(self):
         if self.check.is_critical():
-            self.MeleeCrit(*self.subjects)
+            self.MeleeCrit(self.damage, *self.subjects)
         elif self.check.is_success():
-            self.MeleeHit(*self.subjects)
+            self.MeleeHit(self.damage, *self.subjects)
         elif self.check.is_fumble():
             self.MeleeFumble(*self.subjects)
         else:
@@ -58,11 +67,12 @@ class Melee(Attack):
 
 
 class Ranged(Attack):
-    check = CheckType(["attacker.ranged", "weapon.ranged_bonus"],
+    check_type = CheckType(["attacker.ranged", "weapon.ranged_bonus"],
                       ["target.armor_class"])
+    damage_type = DamageType(["weapon.ranged_damage"])
 
     class RangedHit(AttackHit):
-        damage = DamageType(["weapon.melee_damage"])
+        pass
 
     class RangedCrit(RangedHit, AttackCritical):
         pass
@@ -75,9 +85,9 @@ class Ranged(Attack):
 
     def after(self):
         if self.check.is_critical():
-            self.RangedCrit(*self.subjects)
+            self.RangedCrit(self.damage, *self.subjects)
         elif self.check.is_success():
-            self.RangedHit(*self.subjects)
+            self.RangedHit(self.damage, *self.subjects)
         elif self.check.is_fumble():
             self.RangedFumble(*self.subjects)
         else:
