@@ -8,12 +8,6 @@ class AttackHit(core.Action):
     damage = None
     subjects = ["attacker", "weapon", "target"]
 
-    def after(self):
-        damage = self.damage.get()
-        target = self.subjects[2]
-        for v in damage.values():
-            target.damage += v
-
 
 @core.abstract
 class AttackCritical(AttackHit):

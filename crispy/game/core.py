@@ -1,8 +1,6 @@
 from ecs import ProcessManager
+from ecs import InvertibleDict, ReversibleDict, CallbackDict
 from .objects import WorldObject
-from ecs import InvertibleDict
-from ecs import ReversibleDict
-from ecs import CallbackDict
 from .utils import Point3
 from .utils import Sprite3
 from .consoles import Console
@@ -69,12 +67,6 @@ class World(ProcessManager):
         if hasattr(self.focus, "energy"):
             while self.focus.energy < 0:
                 self()
-
-    def print_to_console(self, text):
-        try:
-            self.console_text += "\n" + text
-        except TypeError:
-            self.console_text += "\n" + str(text)
 
     def set_player(self, x, y=None, z=None, **kwargs):
         pos = get_coor(x, y, z)
