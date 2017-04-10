@@ -1,4 +1,4 @@
-from . import actions
+from . import core
 
 
 def move(entity, direction):
@@ -9,13 +9,13 @@ def move(entity, direction):
     entity.sprite = pos[0], pos[1], pos[2], entity.sprite[3]
 
 
-@actions.abstract
-class Move(actions.Action):
+@core.abstract
+class Move(core.Action):
     subjects = ["agent"]
     direction = (0, 0, 0)
 
 
-@actions.abstract
+@core.abstract
 class Step(Move):
     subjects = ["agent"]
     direction = (0, 0, 0)

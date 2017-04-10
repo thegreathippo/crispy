@@ -1,6 +1,6 @@
 import random
 import worlds
-import gamerules
+import actions
 import constants
 import gui
 
@@ -21,11 +21,11 @@ def take_action(entity):
     if entity.energy >= 0 and entity != world.focus:
         direction = random.choice(directions)
         try:
-            gamerules.movement.steps[direction](entity)
+            actions.movement.steps[direction](entity)
         except ValueError as e:
             target = world.Entity(e.blocking_key)
             if hasattr(target, "damage"):
-                melee = gamerules.attacks.Melee(entity, sword, target)
+                melee = actions.attacks.Melee(entity, sword, target)
                 app.add_to_console(melee.check)
 
 world.register_process(gain_energy, domain="energy")

@@ -1,10 +1,10 @@
-from . import actions
+from . import core
 from .checkrolls import CheckType
 from .damagerolls import DamageType
 
 
-@actions.abstract
-class AttackHit(actions.Action):
+@core.abstract
+class AttackHit(core.Action):
     damage = None
     subjects = ["attacker", "weapon", "target"]
 
@@ -15,23 +15,23 @@ class AttackHit(actions.Action):
             target.damage += v
 
 
-@actions.abstract
+@core.abstract
 class AttackCritical(AttackHit):
     pass
 
 
-@actions.abstract
-class AttackMiss(actions.Action):
+@core.abstract
+class AttackMiss(core.Action):
     subjects = ["attacker", "weapon", "target"]
 
 
-@actions.abstract
+@core.abstract
 class AttackFumble(AttackMiss):
     pass
 
 
-@actions.abstract
-class Attack(actions.Action):
+@core.abstract
+class Attack(core.Action):
     subjects = ["attacker", "weapon", "target"]
     cost = 5
 

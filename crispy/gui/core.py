@@ -1,6 +1,6 @@
 import constants
 import kvy
-import gamerules
+import actions
 import worlds
 import gui.layers
 
@@ -41,12 +41,12 @@ class GameWindow(kvy.KeyboardWidget, kvy.FloatLayout):
     def on_input(self, user_input):
         direction = constants.DIRECTIONS[user_input]
         try:
-            gamerules.movement.steps[direction](app.world.focus)
+            actions.movement.steps[direction](app.world.focus)
         except ValueError as e:
             entity = app.world.Entity(e.blocking_key)
             if hasattr(entity, "damage"):
                 sword = app.world.Entity(melee_bonus=2, melee_damage=["slashing", 1, 6])
-                melee = gamerules.attacks.Melee(app.world.focus, sword, entity)
+                melee = actions.attacks.Melee(app.world.focus, sword, entity)
                 app.add_to_console(melee.check)
 
     def on_tap(self, x, y, z, block):
