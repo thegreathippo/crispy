@@ -76,6 +76,5 @@ class ActionBinding:
         entity = croak.subjects[0]
         text = "{0} has croaked!".format(entity.name)
         world.console.add(text)
-        print("{0}({1}) died".format(entity.name, entity.eid))
         entity.dead = True
 
