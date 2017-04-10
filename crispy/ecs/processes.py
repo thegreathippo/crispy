@@ -10,7 +10,7 @@ from collections import namedtuple
 
 
 class ProcessManager(ComponentManager):
-    Process = namedtuple("Process", ["func", "domain", "domain_view", "priority"])
+    Process = namedtuple("Process", ["func", "domain", "domain_view", "setup", "teardown", "priority"])
 
     def __init__(self):
         """Initialize the ProcessManager class instance.
@@ -22,7 +22,7 @@ class ProcessManager(ComponentManager):
         super().__init__()
         self._queue = list()
 
-    def register_process(self, process, domain, priority=0):
+    def register_process(self, process, domain, setup=None, teardown=None, priority=0):
         """Register a process.
 
           ARGUMENTS:
@@ -31,6 +31,10 @@ class ProcessManager(ComponentManager):
             domain (str): The component associated with this process.
               Every 'step', all entities with this component will
               be passed to the process.
+            setup (callable): A function to be called when this process
+              is being set up. Defaults to None.
+            teardown (callable): A function to be called when this
+              process is being torn down. Defaults to None.
             priority (int): The order of this process in relation to
               other processes. Processes with a higher priority will
               be handled first. Defaults to 0.
@@ -45,13 +49,15 @@ class ProcessManager(ComponentManager):
         if num != 1:
             raise TypeError("{0} must need 1 arg; needs {1}".format(process, num))
         domain_view = self[domain].keys()
-        proc = self.Process(process, domain, domain_view, priority)
+        proc = self.Process(process, domain, domain_view, setup, teardown, priority)
         self._queue.append(proc)
         self._queue.sort(key=lambda x: x.priority, reverse=True)
 
     def __call__(self):
         for process in self._queue:
-            domain_view = list(process.domain_view)
-            for eid in domain_view:
+            if process.setup:
+                process.setup()
+            for eid in process.domain_view:
                 process.func(self.Entity(eid))
-
+            if process.teardown:
+                process.teardown()

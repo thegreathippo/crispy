@@ -68,6 +68,8 @@ class World(ProcessManager):
         if hasattr(self.focus, "energy"):
             while self.focus.energy < 0:
                 self()
+                if not hasattr(self.focus, "energy"):
+                    break
 
     def set_player(self, x, y=None, z=None, **kwargs):
         pos = get_coor(x, y, z)

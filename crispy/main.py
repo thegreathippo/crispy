@@ -21,14 +21,23 @@ def take_action(entity):
         actions.movement.steps[direction](entity)
 
 
-def die(entity):
-    if entity != world.player:
-        world.clear(entity)
+class ClearEntity:
+    eids = list()
+
+    @staticmethod
+    def run(entity):
+        ClearEntity.eids.append(entity.eid)
+
+    @staticmethod
+    def clear():
+        for eid in ClearEntity.eids:
+            entity = world.Entity(eid)
+            world.clear(entity)
 
 
 world.register_process(gain_energy, domain="energy")
 world.register_process(take_action, domain="energy")
-world.register_process(die, domain="dead")
+world.register_process(ClearEntity.run, domain="dead", teardown=ClearEntity.clear)
 
 app.run()
 
