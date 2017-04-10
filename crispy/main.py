@@ -14,16 +14,21 @@ def gain_energy(entity):
 
 directions = list(constants.DIRECTIONS.values())
 
-sword = world.Entity(melee_bonus=1, melee_damage=["slashing", 1, 6])
-
 
 def take_action(entity):
     if entity.energy >= 0 and entity != world.focus:
         direction = random.choice(directions)
         actions.movement.steps[direction](entity)
 
+
+def die(entity):
+    if entity != world.player:
+        world.clear(entity)
+
+
 world.register_process(gain_energy, domain="energy")
 world.register_process(take_action, domain="energy")
+world.register_process(die, domain="dead")
 
 app.run()
 

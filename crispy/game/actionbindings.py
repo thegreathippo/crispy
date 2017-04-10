@@ -12,6 +12,7 @@ class ActionBinding:
         actions.attacks.AttackCritical.bind_after(self.on_attack_critical)
         actions.attacks.AttackFumble.bind_after(self.on_attack_fumble)
         actions.damages.TakeDamage.bind_after(self.on_take_damage)
+        actions.damages.Croak.bind_after(self.on_croak)
 
     @staticmethod
     def on_step(step):
@@ -60,7 +61,21 @@ class ActionBinding:
         world.console.add(text)
 
     @staticmethod
-    def on_take_damage(damage):
-        target = damage.subjects[0]
-        text = "{0} took {1} damage!".format(target.name, damage.damage.get())
+    def on_take_damage(take_damage):
+        agent = take_damage.subjects[0]
+        damage = take_damage.damage.get()
+        agent.damage += damage.total()
+        remaining_hp = agent.max_hp - agent.damage
+        text = "{0} took {1} damage! (HP: {2})".format(agent.name, damage, remaining_hp)
         world.console.add(text)
+        if agent.damage >= agent.max_hp:
+            actions.damages.Croak(agent)
+
+    @staticmethod
+    def on_croak(croak):
+        entity = croak.subjects[0]
+        text = "{0} has croaked!".format(entity.name)
+        world.console.add(text)
+        print("{0}({1}) died".format(entity.name, entity.eid))
+        entity.dead = True
+

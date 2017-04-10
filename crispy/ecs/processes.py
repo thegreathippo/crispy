@@ -10,7 +10,7 @@ from collections import namedtuple
 
 
 class ProcessManager(ComponentManager):
-    Process = namedtuple("Process", ["func", "domain", "priority"])
+    Process = namedtuple("Process", ["func", "domain", "domain_view", "priority"])
 
     def __init__(self):
         """Initialize the ProcessManager class instance.
@@ -45,13 +45,13 @@ class ProcessManager(ComponentManager):
         if num != 1:
             raise TypeError("{0} must need 1 arg; needs {1}".format(process, num))
         domain_view = self[domain].keys()
-        proc = self.Process(process, domain_view, priority)
+        proc = self.Process(process, domain, domain_view, priority)
         self._queue.append(proc)
         self._queue.sort(key=lambda x: x.priority, reverse=True)
 
     def __call__(self):
         for process in self._queue:
-            domain_view = process.domain
+            domain_view = list(process.domain_view)
             for eid in domain_view:
                 process.func(self.Entity(eid))
 

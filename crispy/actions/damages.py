@@ -9,3 +9,5 @@ class TakeDamage(core.Action):
         super().__init__(*args, **kwargs)
 
 
+class Croak(core.Action):
+    subjects = ["agent"]

@@ -44,6 +44,7 @@ class World(ProcessManager):
         self["melee_damage"] = dict()
         self["max_hp"] = dict()
         self["damage"] = dict()
+        self["dead"] = dict()
         self.clear()
 
     @property
@@ -115,10 +116,13 @@ class World(ProcessManager):
             return self.Entity(eid)
 
     def clear(self, entity=None):
-        super().clear(entity)
-        self.set_player(0, 0, 0)
-        self.camera.pos = 0, 0, 0
-        self.focus = self.player
+        if entity:
+            super().clear(entity)
+        else:
+            super().clear()
+            self.set_player(0, 0, 0)
+            self.camera.pos = 0, 0, 0
+            self.focus = self.player
 
 
 def get_coor(x, y=None, z=None):

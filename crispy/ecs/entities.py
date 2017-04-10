@@ -29,7 +29,7 @@ class BaseEntity:
         try:
             return self.root.get_entity_component(self, attr)
         except KeyError:
-            return super().__getattribute__(attr)
+            raise AttributeError("{0} has no attribute {1}".format(self.eid, attr))
 
     def __setattr__(self, attr, value):
         if attr not in self.root:
