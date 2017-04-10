@@ -21,21 +21,6 @@ def take_action(entity):
         actions.movement.steps[direction](entity)
 
 
-class ClearEntity:
-    eids = list()
-
-    @staticmethod
-    def run(entity):
-        ClearEntity.eids.append(entity.eid)
-
-    @staticmethod
-    def clear():
-        for eid in ClearEntity.eids:
-            entity = world.Entity(eid)
-            world.clear(entity)
-        ClearEntity.eids.clear()
-
-
 def clear_entity(entity):
     world.clear(entity)
 
