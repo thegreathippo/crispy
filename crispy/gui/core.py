@@ -37,6 +37,7 @@ class GameWindow(kvy.KeyboardWidget, kvy.FloatLayout):
 
     def update_console(self, *args):
         self.console.text = app.world.console.get()
+        self.console.scroll_y = 0
 
     def on_input(self, user_input):
         direction = constants.DIRECTIONS[user_input]

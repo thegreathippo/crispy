@@ -14,17 +14,27 @@
     size_hint: 1, 0.1
 
 
+<ScrollLabel@ScrollView>
+    text: ""
+
+    Label:
+        size_hint_y: None
+        height: self.texture_size[1]
+        text_size: self.width, None
+        text: root.text
+
+
 <GameWindow>:
 
     View:
         id: view_screen
 
-    Label:
+    ScrollLabel:
         id: console
-        text_size: root.width, root.height
-        size: self.texture_size
         color: 1, .25, .25, 1
         valign: "top"
+        size_hint: 1, 0.9
+        pos_hint: {"top": 1}
 
     Menu:
         id: menu
@@ -58,4 +68,7 @@
         EditButton:
             text: "Clear"
             on_press: app.world.clear()
+        EditButton:
+            text: "Clear Text"
+            on_press: app.world.console.clear()
 

@@ -15,3 +15,6 @@ class Console:
         except TypeError:
             self.text += " " + str(maybe_text) + "\n"
 
+    def clear(self):
+        self.text = "\n"
+        self.add("Console cleared.")
