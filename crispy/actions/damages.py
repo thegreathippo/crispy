@@ -2,12 +2,12 @@ from . import core
 
 
 class TakeDamage(core.Action):
-    subjects = ["agent"]
 
-    def __init__(self, damage, *args, **kwargs):
+    def __init__(self, damage, *args):
         self.damage = damage
-        super().__init__(*args, **kwargs)
+        super().__init__(*args)
 
 
 class Croak(core.Action):
-    subjects = ["agent"]
+    pass
+

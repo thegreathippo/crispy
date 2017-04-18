@@ -1,10 +1,13 @@
-from ecs import ProcessManager
-from ecs import InvertibleDict, ReversibleDict, CallbackDict
-from .objects import WorldObject
+from imbroglio import System
+from customdicts import InvertibleDict, ReversibleDict, CustomDict
 from .utils import Point3
 from .utils import Sprite3
 from .consoles import Console
 import constants
+
+
+PLAYER_EID = 1
+CAMERA_EID = 0
 
 
 class Cell3Dict(InvertibleDict):
@@ -17,47 +20,31 @@ class Pos3Dict(ReversibleDict):
         super().__setitem__(item, Point3(*value))
 
 
-class Sprite3Dict(CallbackDict):
+class Sprite3Dict(CustomDict):
     def __setitem__(self, item, value):
         super().__setitem__(item, Sprite3(*value))
 
 
-class World(ProcessManager):
+class World(System):
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.console = Console("Initializing...")
-
-        class WorldEntity(WorldObject, self.Entity):
-            pass
-
-        self.Entity = WorldEntity
-        self._focus = constants.EID_PLAYER
-        self["name"] = dict()
-        self["cell"] = Cell3Dict()
-        self["pos"] = Pos3Dict()
-        self["sprite"] = Sprite3Dict(self)
-        self["energy"] = dict()
-        self["melee"] = dict()
-        self["armor_class"] = dict()
-        self["melee_bonus"] = dict()
-        self["melee_damage"] = dict()
-        self["max_hp"] = dict()
-        self["damage"] = dict()
-        self["dead"] = dict()
+        self._focus = PLAYER_EID
         self.clear()
+
 
     @property
     def player(self):
-        return self.Entity(constants.EID_PLAYER)
+        return self.get_entity(PLAYER_EID)
 
     @property
     def camera(self):
-        return self.Entity(constants.EID_CAMERA)
+        return self.get_entity(CAMERA_EID)
 
     @property
     def focus(self):
-        return self.Entity(self._focus)
+        return self.get_entity(self._focus)
 
     @focus.setter
     def focus(self, entity_or_eid):
@@ -67,7 +54,7 @@ class World(ProcessManager):
     def spin(self, *args):
         if hasattr(self.focus, "energy"):
             while self.focus.energy < 0:
-                self()
+                self.processes()
                 if not hasattr(self.focus, "energy"):
                     break
 
@@ -100,7 +87,7 @@ class World(ProcessManager):
         kwargs["damage"] = 0
         kwargs["max_hp"] = 10
         kwargs["cell"] = pos
-        e = self.Entity(**kwargs)
+        e = self.new_entity(**kwargs)
         return e
 
     def set_cell(self, x, y=None, z=None, **kwargs):
@@ -108,23 +95,24 @@ class World(ProcessManager):
         cell = self.get_cell(x, y, z)
         if cell:
             return
-        e = self.Entity(cell=pos, **kwargs)
+        e = self.new_entity(cell=pos, **kwargs)
         return e
 
     def get_cell(self, x, y=None, z=None):
         pos = get_coor(x, y, z)
         eid = self["cell"].inverse.get(pos, None)
         if eid is not None:
-            return self.Entity(eid)
+            return self.get_entity(eid)
 
-    def clear(self, entity=None):
-        if entity:
-            super().clear(entity)
-        else:
-            super().clear()
-            self.set_player(0, 0, 0)
-            self.camera.pos = 0, 0, 0
-            self.focus = self.player
+    def clear(self):
+        super().clear()
+        camera = self.new_entity()
+        self.eids.increment(camera.eid)
+        player = self.new_entity()
+        self.eids.increment(player.eid)
+        self.set_player(0, 0, 0)
+        self.camera.pos = 0, 0, 0
+        self.focus = self.player
 
 
 def get_coor(x, y=None, z=None):
@@ -141,4 +129,6 @@ def get_eid(entity_or_eid):
         eid = entity_or_eid
     return eid
 
-world = World()
+world = World("name", "energy", "melee", "armor_class", "melee_bonus", "melee_damage", "max_hp", "damage", "dead",
+              cell=Cell3Dict, pos=Pos3Dict, sprite=Sprite3Dict)
+

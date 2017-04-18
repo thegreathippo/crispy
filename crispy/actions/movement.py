@@ -1,21 +1,18 @@
 from . import core
 
 
-@core.abstract
 class Move(core.Action):
-    subjects = ["agent"]
     direction = (0, 0, 0)
 
 
-@core.abstract
 class Step(Move):
-    subjects = ["agent"]
     direction = (0, 0, 0)
     cost = 5
 
 
 class NoStep(Step):
     direction = (0, 0, 0)
+    cost = 1
 
 
 class StepNorth(Step):

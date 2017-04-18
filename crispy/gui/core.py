@@ -22,9 +22,9 @@ class GameWindow(kvy.KeyboardWidget, kvy.FloatLayout):
         menu = self.ids["menu"]
         console = self.ids["console"]
 
-        app.world["sprite"].bind_new(view.load_sprite)
-        app.world["sprite"].bind_del(view.unload_sprite)
-        app.world["sprite"].bind_change(view.change_sprite)
+        app.world.bind_new("sprite", view.load_sprite)
+        app.world.bind_del("sprite", view.unload_sprite)
+        app.world.bind_change("sprite", view.change_sprite)
 
         app.world.set_player(0, 0, 0)
 
@@ -69,7 +69,7 @@ class GameWindow(kvy.KeyboardWidget, kvy.FloatLayout):
             self.menu.on_touch_down(touch)
         else:
             x, y = kvy.get_touched_cell(touch.pos, app.world.camera.pos)
-            z = app.world.camera.z
+            z = app.world.camera.pos[2]
             cell = app.world.get_cell(x, y, z)
             if not cell:
                 cell = app.world.get_cell(x, y, z - 1)

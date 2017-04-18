@@ -22,12 +22,12 @@ def take_action(entity):
 
 
 def clear_entity(entity):
-    world.clear(entity)
+    world.clear_entity(entity)
 
 
-world.register_process(gain_energy, domain="energy")
-world.register_process(take_action, domain="energy")
-world.register_process(clear_entity, domain="dead")
+world.processes.register(gain_energy, domain="energy")
+world.processes.register(take_action, domain="energy")
+world.processes.register(clear_entity, domain="dead")
 
 app.run()
 

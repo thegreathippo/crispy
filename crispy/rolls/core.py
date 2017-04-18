@@ -6,14 +6,15 @@ namedtuple = collections.namedtuple
 randint = random.randint
 
 
-def roller(self, low, high):
+def _roller(low, high):
     return [randint(low, high), randint(low, high)]
 
 
 class DieRoll:
-    roller = roller
-
-    def __init__(self, *args):
+    def __init__(self, *args, roller=None):
+        if roller is None:
+            roller = _roller
+        self.roller = roller
         self.die = _get_die(args)
         self.roll = _get_roll(self.die, self.roller)
         self.bonus = self.die.bonus
@@ -54,31 +55,27 @@ class DieRoll:
 
 
 class Dice:
-    # Add a bonus field? Adds to value?
-    roller = roller
-
-    def __init__(self, *args):
-        super().__init__()
+    def __init__(self, *args, roller=None):
+        if roller is None:
+            roller = _roller
+        self.roller = roller
         self.vantage = 0
         self._dierolls = list()
-        dice = weakref.ref(self)
-
-        class _DieRoll(DieRoll):
-            def unbind(self):
-                dice().remove(self)
-                # Once unbound, it's just a DieRoll.
-                self.__class__ = DieRoll
-
-            @property
-            def roller(self):
-                return dice().roller
-
-        self._DieRoll = _DieRoll
         if args:
             self.add(*args)
 
+    def get_unbinder(self, dieroll):
+        dice = weakref.ref(self)
+        die = weakref.ref(dieroll)
+
+        def unbind():
+            dice().remove(die())
+
+        return unbind
+
     def add(self, *args):
-        dieroll = self._DieRoll(*args)
+        dieroll = DieRoll(*args, roller=self.roller)
+        dieroll.unbind = self.get_unbinder(dieroll)
         self._dierolls.append(dieroll)
         return dieroll
 
@@ -112,43 +109,40 @@ class Dice:
 
 
 class DicePool:
-    roller = roller
-
-    def __init__(self, dice_type=None, *args):
-        super().__init__()
+    def __init__(self, dice_type=None, *args, roller=None):
+        if roller is None:
+            roller = _roller
+        self.roller = roller
         self.vantage = None
-        self._die = dict()
+        self._die = weakref.WeakKeyDictionary()
         self._dice = dict()
         dicepool = weakref.ref(self)
 
-        class _Dice(Dice):
+        def unbind_die(dieroll):
+            dp = dicepool()
+            d_type = dp._die[dieroll]
+            dice = dp[d_type]
+            dice.remove(dieroll)
+            if not dice:
+                del dp[d_type]
+            del dp._die[dieroll]
 
-            def remove_dieroll(self, dieroll):
-                super().remove(dieroll)
-                dp = dicepool()
-                dice_type = dp._die[dieroll]
-                if not dp[dice_type]:
-                    del dp[dice_type]
-                del dp._die[dieroll]
-
-            @property
-            def roller(self):
-                return dicepool().roller
-
-        self._Dice = _Dice
+        self._unbind_die = unbind_die
         if args:
             self.add(dice_type, *args)
 
     def add(self, dice_type=None, *args):
         if dice_type not in self:
-            self[dice_type] = self._Dice()
+            dice = Dice(roller=self.roller)
+            self[dice_type] = dice
+            dice.unbind_die = self._unbind_die
         dieroll = self[dice_type].add(*args)
         self._die[dieroll] = dice_type
         return dieroll
 
     def remove(self, dieroll):
         dice_type = self._die[dieroll]
-        self[dice_type].remove_die(dieroll)
+        self[dice_type].unbind_die(dieroll)
 
     def get(self):
         result = _DicePoolDict()
@@ -194,6 +188,7 @@ class _DicePoolDict(dict):
 
 
 Die = namedtuple("Die", ["number", "face", "bonus"])
+Roll = namedtuple("Roll", ["first", "high", "low"])
 
 
 def _get_die(args):
@@ -208,10 +203,7 @@ def _get_die(args):
     return Die(n, f, b)
 
 
-Roll = namedtuple("Roll", ["first", "high", "low"])
-
-
-def _get_roll(die, roller=roller):
+def _get_roll(die, roller=_roller):
     first, high, low = 0, 0, 0
     for i in range(0, die.number):
         roll = roller(1, die.face)

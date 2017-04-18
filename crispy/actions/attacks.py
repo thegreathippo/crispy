@@ -1,47 +1,50 @@
 from . import core
 from .damages import TakeDamage
-from .checkrolls import CheckType
-from .damagerolls import DamageType
+from rolls import CheckType
+from rolls import DamageType
 
 
-@core.abstract
+melee_check = CheckType(["attacker.melee", "weapon.melee_bonus"], ["target.armor_class"])
+melee_damage = DamageType(["weapon.melee_damage"])
+
+range_check = CheckType(["attacker.ranged", "weapon.range_bonus"], ["target.armor_class"])
+range_damage = DamageType(["weapon.ranged_damage"])
+
+
 class AttackHit(core.Action):
-    damage = None
-    subjects = ["attacker", "weapon", "target"]
+    subjects = ("attacker", "weapon", "target")
 
-    def __init__(self, damage, *args, **kwargs):
-        self.damage = damage
-        super().__init__(*args, **kwargs)
+    def __init__(self, damage_roll, *args):
+        super().__init__(*args)
+        self.damage_roll = damage_roll
 
     def after(self):
-        TakeDamage(self.damage, self.subjects.target)
+        super().after()
+        TakeDamage(self.damage_roll.get(), self.target)
 
 
-@core.abstract
 class AttackCritical(AttackHit):
     pass
 
 
-@core.abstract
 class AttackMiss(core.Action):
-    subjects = ["attacker", "weapon", "target"]
+    subjects = ("attacker", "weapon", "target")
 
 
-@core.abstract
 class AttackFumble(AttackMiss):
     pass
 
 
-@core.abstract
 class Attack(core.Action):
-    subjects = ["attacker", "weapon", "target"]
+    subjects = ("attacker", "weapon", "target")
     cost = 5
 
 
 class Melee(Attack):
-    check_type = CheckType(["attacker.melee", "weapon.melee_bonus"],
-                      ["target.armor_class"])
-    damage_type = DamageType(["weapon.melee_damage"])
+    def __init__(self, *args):
+        super().__init__(*args)
+        self.check_roll = melee_check(self.get_subjects())
+        self.damage_roll = melee_damage(self.get_subjects())
 
     class MeleeHit(AttackHit):
         pass
@@ -56,20 +59,23 @@ class Melee(Attack):
         pass
 
     def after(self):
-        if self.check.is_critical():
-            self.MeleeCrit(self.damage, *self.subjects)
-        elif self.check.is_success():
-            self.MeleeHit(self.damage, *self.subjects)
-        elif self.check.is_fumble():
-            self.MeleeFumble(*self.subjects)
+        super().after()
+        if self.check_roll.is_critical():
+            self.MeleeCrit(self.damage_roll, self.attacker, self.weapon, self.target)
+        elif self.check_roll.is_success():
+            self.MeleeHit(self.damage_roll, self.attacker, self.weapon, self.target)
+        elif self.check_roll.is_fumble():
+            self.MeleeFumble(self.attacker, self.weapon, self.target)
         else:
-            self.MeleeMiss(*self.subjects)
+            self.MeleeMiss(self.attacker, self.weapon, self.target)
 
 
 class Ranged(Attack):
-    check_type = CheckType(["attacker.ranged", "weapon.ranged_bonus"],
-                      ["target.armor_class"])
-    damage_type = DamageType(["weapon.ranged_damage"])
+
+    def __init__(self, *args):
+        super().__init__(*args)
+        self.check_roll = range_check(self.get_subjects())
+        self.damage_roll = range_damage(self.get_subjects())
 
     class RangedHit(AttackHit):
         pass
@@ -84,12 +90,13 @@ class Ranged(Attack):
         pass
 
     def after(self):
-        if self.check.is_critical():
-            self.RangedCrit(self.damage, *self.subjects)
-        elif self.check.is_success():
-            self.RangedHit(self.damage, *self.subjects)
-        elif self.check.is_fumble():
-            self.RangedFumble(*self.subjects)
+        super().after()
+        if self.check_roll.is_critical():
+            self.RangedCrit(self.damage_roll, self.attacker, self.weapon, self.target)
+        elif self.check_roll.is_success():
+            self.RangedHit(self.damage_roll, self.attacker, self.weapon, self.target)
+        elif self.check_roll.is_fumble():
+            self.RangedFumble(self.attacker, self.weapon, self.target)
         else:
-            self.RangedMiss(*self.subjects)
+            self.RangedMiss(self.attacker, self.weapon, self.target)
 
