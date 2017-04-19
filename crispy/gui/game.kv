@@ -52,8 +52,8 @@
             text: "Monster"
             on_press: root.mode = const.EDIT_MODE_MONSTER
         EditButton:
-            text: "Player"
-            on_press: root.mode = const.EDIT_MODE_PLAYER
+            text: "Human"
+            on_press: root.mode = const.EDIT_MODE_HUMAN
         EditButton:
             text: "Select"
             on_press: root.mode = const.EDIT_MODE_SELECT
@@ -69,7 +69,4 @@
         EditButton:
             text: "Clear"
             on_press: app.world.clear()
-        EditButton:
-            text: "Clear Text"
-            on_press: app.world.console.clear()
 

@@ -37,7 +37,7 @@ class View(kvy.ScatterLayout):
     def change_sprite(self, entity, old_data, new_data):
         eid = entity.eid
         if old_data.z != new_data.z:
-            self.remove_sprite(entity)
+            self.unload_sprite(entity)
             self.load_sprite(entity, new_data)
         else:
             layer = self.eid_to_layer[eid]

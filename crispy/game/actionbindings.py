@@ -5,6 +5,7 @@ from .core import world
 
 class ActionBinding:
     def __init__(self):
+        actions.core.Action.bind_after(self.on_action)
         actions.movement.Step.bind_after(self.on_step)
         actions.attacks.Attack.bind_after(self.on_attack)
         actions.attacks.AttackHit.bind_after(self.on_attack_hit)
@@ -29,6 +30,10 @@ class ActionBinding:
             if hasattr(target, "damage") and hasattr(entity, "energy"):
                 sword = world.new_entity(melee_damage=["slashing", 1, 6], melee_bonus=1, name="sword")
                 actions.attacks.Melee(entity, sword, target)
+
+    @staticmethod
+    def on_action(action):
+        pass
 
     @staticmethod
     def on_attack(attack):
@@ -78,5 +83,5 @@ class ActionBinding:
         entity = croak.agent
         text = "{0} has croaked!".format(entity.name)
         world.console.add(text)
-        entity.dead = True
+        world.clear_entity(entity)
 

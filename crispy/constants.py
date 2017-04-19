@@ -26,11 +26,11 @@ DIRECTIONS = {
 EDIT_MODE_ERASE = "edit erase mode"
 EDIT_MODE_FLOOR = "edit floor mode"
 EDIT_MODE_WALL = "edit wall mode"
-EDIT_MODE_PLAYER = "edit player mode"
+EDIT_MODE_HUMAN = "edit human mode"
 EDIT_MODE_MONSTER = "edit monster mode"
 EDIT_MODE_SELECT = "select focus mode"
 
-EDIT_DRAW_MODES = [EDIT_MODE_FLOOR, EDIT_MODE_WALL, EDIT_MODE_MONSTER]
+EDIT_DRAW_MODES = [EDIT_MODE_FLOOR, EDIT_MODE_WALL, EDIT_MODE_MONSTER, EDIT_MODE_HUMAN]
 
 IMG_GRANITE = "img_granite"
 IMG_PLAYER = "img_player"
